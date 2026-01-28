@@ -2,6 +2,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from '@/components/ui/Toast';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,7 +37,9 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
         <body className="antialiased">
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </body>
       </html>
     </ClerkProvider>
