@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { getOrCreateUser } from '@/lib/services/user-sync';
 import { db } from '@/lib/db';
 import { resumes } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
@@ -15,8 +15,8 @@ interface ResumePageProps {
 }
 
 export default async function ResumePage({ params }: ResumePageProps) {
-  const { userId } = await auth();
-  if (!userId) {
+  const user = await getOrCreateUser();
+  if (!user) {
     notFound();
   }
 
@@ -28,7 +28,7 @@ export default async function ResumePage({ params }: ResumePageProps) {
     .from(resumes)
     .where(eq(resumes.id, id));
 
-  if (!resume || resume.userId !== userId) {
+  if (!resume || resume.userId !== user.id) {
     notFound();
   }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { parseResume } from '@/lib/services/parse-resume';
+import { getOrCreateUser } from '@/lib/services/user-sync';
 import { db } from '@/lib/db';
 import { resumes } from '@/lib/db/schema';
 
@@ -8,9 +8,9 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const { userId } = await auth();
-    if (!userId) {
+    // Get or create user in database
+    const user = await getOrCreateUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -70,9 +70,9 @@ export async function POST(request: NextRequest) {
     const [resume] = await db
       .insert(resumes)
       .values({
-        userId,
+        userId: user.id, // Use database user ID (UUID), not Clerk ID
         originalFilename: file.name,
-        storageKey: `uploads/${userId}/${Date.now()}-${file.name}`, // Temporary - will implement actual storage later
+        storageKey: `uploads/${user.id}/${Date.now()}-${file.name}`, // Temporary - will implement actual storage later
         mimeType: file.type,
         fileSizeBytes: file.size,
         rawText: parseResult.rawText,
