@@ -14,7 +14,7 @@ export default async function UploadPage() {
 
   // TODO: Fetch user's credits from database
   const creditsRemaining = 1;
-  const subscriptionTier = 'free';
+  const subscriptionTier: 'free' | 'pro' | 'coach' = 'free';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light to-white">
