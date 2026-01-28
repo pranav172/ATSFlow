@@ -1,20 +1,20 @@
-import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
+import { getOrCreateUser } from '@/lib/services/user-sync';
 import Header from '@/components/Header';
-import { FileUpload } from '@/components/FileUpload';
+import FileUpload from '@/components/FileUpload';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { redirect } from 'next/navigation';
 
 export default async function UploadPage() {
-  const { userId } = await auth();
-
-  if (!userId) {
+  // Get or create user in database
+  const user = await getOrCreateUser();
+  if (!user) {
     redirect('/sign-in');
   }
 
-  // TODO: Fetch user's credits from database
-  const creditsRemaining = 1;
-  const subscriptionTier: 'free' | 'pro' | 'coach' = 'free';
+  // Get user's subscription info (will be used for credit limits)
+  const subscriptionTier: 'free' | 'pro' | 'coach' = user.subscriptionTier || 'free';
+  const creditsRemaining = user.creditsRemaining || 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-white to-violet-50 dark:from-dark-background dark:via-dark-surface dark:to-purple-950/20 transition-colors duration-300">
