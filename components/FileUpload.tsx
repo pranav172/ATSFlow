@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
@@ -20,7 +21,8 @@ interface UploadState {
   fileName?: string;
 }
 
-export function FileUpload({ onUploadComplete }: { onUploadComplete?: (resumeId: string) => void }) {
+export function FileUpload() {
+  const router = useRouter();
   const [uploadState, setUploadState] = useState<UploadState>({
     status: 'idle',
     progress: 0,
@@ -106,12 +108,10 @@ export function FileUpload({ onUploadComplete }: { onUploadComplete?: (resumeId:
           variant: 'success',
         });
 
-        // Auto-redirect after 1.5 seconds
-        setTimeout(() => {
-          if (onUploadComplete) {
-            onUploadComplete('test-resume-id');
-          }
-        }, 1500);
+        // Auto-redirect after 1.5 seconds (commented out for now - will implement after Phase 6)
+        // setTimeout(() => {
+        //   router.push('/resumes/test-resume-id');
+        // }, 1500);
       } catch (error) {
         setUploadState({
           status: 'error',
@@ -126,7 +126,7 @@ export function FileUpload({ onUploadComplete }: { onUploadComplete?: (resumeId:
         });
       }
     },
-    [addToast, onUploadComplete]
+    [addToast, router]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({

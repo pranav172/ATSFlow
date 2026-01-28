@@ -61,11 +61,7 @@ export default async function UploadPage() {
           </Card>
 
           {/* Upload Widget */}
-          <FileUpload
-            onUploadComplete={(resumeId) => {
-              redirect(`/resumes/${resumeId}`);
-            }}
-          />
+          <FileUpload />
 
           {/* Info Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
