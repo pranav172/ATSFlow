@@ -10,31 +10,42 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary Brand Colors
+        // Modern Purple/Violet Theme
         primary: {
-          DEFAULT: '#6366f1', // Indigo 500
-          hover: '#4f46e5',   // Indigo 600
-          light: '#e0e7ff',   // Indigo 100
+          DEFAULT: '#8b5cf6', // Violet 500
+          hover: '#7c3aed',   // Violet 600
+          light: '#ede9fe',   // Violet 100
+          dark: '#6d28d9',    // Violet 700
         },
-        // Status Colors
+        // Status Colors (Dark Mode Optimized)
         success: '#10b981',   // Emerald 500
         warning: '#f59e0b',   // Amber 500
         danger: '#ef4444',    // Red 500
-        info: '#3b82f6',      // Blue 500
-        // Background & Surface
+        info: '#06b6d4',      // Cyan 500
+        
+        // Light Mode
         background: '#ffffff',
         surface: '#f8fafc',   // Slate 50
         border: '#e2e8f0',    // Slate 200
-        // Text Colors
+        
+        // Text Colors (Light Mode)
         text: {
           primary: '#0f172a',    // Slate 900
           secondary: '#64748b',  // Slate 500
           muted: '#94a3b8',      // Slate 400
         },
-        // Dark Mode
+        
+        // Dark Mode Colors
         dark: {
-          background: '#0f172a', // Slate 900
-          surface: '#1e293b',    // Slate 800
+          background: '#0a0a0f', // Deep Dark Navy
+          surface: '#1a1a24',    // Dark Surface
+          surfaceHover: '#252530', // Hover state
+          border: '#2d2d3d',     // Subtle border
+          text: {
+            primary: '#f1f5f9',    // Slate 100
+            secondary: '#cbd5e1',  // Slate 300
+            muted: '#94a3b8',      // Slate 400
+          },
         },
       },
       fontFamily: {
@@ -67,6 +78,10 @@ const config: Config = {
       transitionTimingFunction: {
         'button': 'ease-out',
         'modal': 'cubic-bezier(0.4, 0, 0.2, 1)',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
   },

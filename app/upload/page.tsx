@@ -17,23 +17,23 @@ export default async function UploadPage() {
   const subscriptionTier: 'free' | 'pro' | 'coach' = 'free';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light to-white">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-white to-violet-50 dark:from-dark-background dark:via-dark-surface dark:to-purple-950/20 transition-colors duration-300">
       <Header />
       
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-text-primary mb-2">
+            <h1 className="text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
               Upload Your Resume
             </h1>
-            <p className="text-lg text-text-secondary">
+            <p className="text-lg text-text-secondary dark:text-dark-text-secondary">
               Get your ATS score and optimization suggestions in seconds ⚡
             </p>
           </div>
 
           {/* Credits Display */}
-          <Card className="bg-white">
+          <Card className="bg-white dark:bg-dark-surface">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -52,7 +52,7 @@ export default async function UploadPage() {
                       <div className="text-3xl font-bold text-primary">
                         {creditsRemaining}
                       </div>
-                      <div className="text-xs text-text-muted">remaining</div>
+                      <div className="text-xs text-text-muted dark:text-dark-text-muted">remaining</div>
                     </div>
                   )}
                 </div>
