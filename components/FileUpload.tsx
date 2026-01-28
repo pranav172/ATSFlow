@@ -21,7 +21,7 @@ interface UploadState {
   fileName?: string;
 }
 
-export function FileUpload() {
+export default function FileUpload() {
   const router = useRouter();
   const [uploadState, setUploadState] = useState<UploadState>({
     status: 'idle',
