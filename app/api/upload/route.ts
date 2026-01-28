@@ -72,15 +72,15 @@ export async function POST(request: NextRequest) {
       .values({
         userId,
         originalFilename: file.name,
-        fileType: parseResult.fileType as 'pdf' | 'docx',
+        storageKey: `uploads/${userId}/${Date.now()}-${file.name}`, // Temporary - will implement actual storage later
+        mimeType: file.type,
         fileSizeBytes: file.size,
         rawText: parseResult.rawText,
         structuredContent: parseResult.structuredContent,
-        parsingStatus: 'completed',
+        status: 'parsed',
         // Default null values for fields that will be filled in Phase 7
         atsScore: null,
         atsAnalysis: null,
-        optimizationStatus: 'pending',
       })
       .returning();
 
