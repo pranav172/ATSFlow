@@ -87,31 +87,87 @@ export function FileUpload() {
         return;
       }
 
-      // Simulate upload (replace with actual API call later)
+      // Upload file to API
       try {
-        setUploadState({ status: 'uploading', progress: 10, fileName: file.name });
+        setUploadState({ status: 'uploading', progress: 0, fileName: file.name });
 
-        // Simulate progress
-        for (let i = 10; i <= 90; i += 10) {
-          await new Promise((resolve) => setTimeout(resolve, 200));
-          setUploadState((prev) => ({...prev, progress: i }));
-        }
+        const formData = new FormData();
+        formData.append('file', file);
 
-        setUploadState({ status: 'processing', progress: 95, fileName: file.name });
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        const xhr = new XMLHttpRequest();
 
-        setUploadState({ status: 'complete', progress: 100, fileName: file.name });
-
-        addToast({
-          title: 'Success!',
-          description: 'Resume uploaded successfully',
-          variant: 'success',
+        // Track upload progress
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 90); // Reserve 10% for processing
+            setUploadState((prev) => ({ ...prev, progress: percentComplete }));
+          }
         });
 
-        // Auto-redirect after 1.5 seconds (commented out for now - will implement after Phase 6)
-        // setTimeout(() => {
-        //   router.push('/resumes/test-resume-id');
-        // }, 1500);
+        // Handle completion
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            
+            setUploadState({ status: 'complete', progress: 100, fileName: file.name });
+
+            addToast({
+              title: 'Success!',
+              description: 'Resume uploaded and parsed successfully',
+              variant: 'success',
+            });
+
+            // Navigate to resume page after brief delay
+            setTimeout(() => {
+              router.push(`/resumes/${response.resumeId}`);
+            }, 1500);
+          } else {
+            // Handle error response
+            let errorMessage = 'Upload failed. Please try again.';
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              errorMessage = errorData.message || errorMessage;
+            } catch (e) {
+              // Use default error message
+            }
+
+            setUploadState({
+              status: 'error',
+              progress: 0,
+              error: errorMessage,
+            });
+
+            addToast({
+              title: 'Upload Failed',
+              description: errorMessage,
+              variant: 'danger',
+            });
+          }
+        });
+
+        // Handle network errors
+        xhr.addEventListener('error', () => {
+          setUploadState({
+            status: 'error',
+            progress: 0,
+            error: 'Network error. Please check your connection.',
+          });
+
+          addToast({
+            title: 'Upload Failed',
+            description: 'Network error. Please try again.',
+            variant: 'danger',
+          });
+        });
+
+        // Start upload
+        xhr.open('POST', '/api/upload');
+        xhr.send(formData);
+
+        // Show processing state while server parses
+        xhr.upload.addEventListener('load', () => {
+          setUploadState({ status: 'processing', progress: 95, fileName: file.name });
+        });
       } catch (error) {
         setUploadState({
           status: 'error',
