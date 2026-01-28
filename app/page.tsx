@@ -1,22 +1,48 @@
+import { SignedIn, SignedOut } from '@clerk/nextjs';
+import Link from 'next/link';
+import Header from '@/components/Header';
+
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-light to-white">
-      <div className="text-center space-y-6 p-8">
-        <h1 className="text-5xl font-bold text-text-primary">
-          ATSFlow
-        </h1>
-        <p className="text-2xl text-text-secondary">
-          Beat the Bots. Land the Job.
-        </p>
-        <div className="flex gap-4 justify-center mt-8">
-          <button className="btn-primary animate-cta-pulse">
-            Analyze My Resume Free ⚡
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-primary-light to-white">
+      <SignedIn>
+        <Header />
+      </SignedIn>
+      
+      <main className="flex items-center justify-center min-h-screen p-8">
+        <div className="text-center space-y-6 max-w-4xl">
+          <h1 className="text-5xl md:text-6xl font-bold text-text-primary">
+            Beat the Bots. Land the Job.
+          </h1>
+          <p className="text-xl md:text-2xl text-text-secondary max-w-2xl mx-auto">
+            AI-powered resume optimization that gets past applicant tracking systems and in front of hiring managers.
+          </p>
+          
+          <div className="flex gap-4 justify-center mt-8 flex-wrap">
+            <SignedOut>
+              <Link href="/sign-up">
+                <button className="btn-primary animate-cta-pulse">
+                  Analyze My Resume Free ⚡
+                </button>
+              </Link>
+            </SignedOut>
+            
+            <SignedIn>
+              <Link href="/upload">
+                <button className="btn-primary animate-cta-pulse">
+                  Upload Resume →
+                </button>
+              </Link>
+            </SignedIn>
+          </div>
+          
+          <div className="flex gap-6 justify-center mt-6 text-sm text-text-muted flex-wrap">
+            <span>⚡ No credit card required</span>
+            <span>🎯 5,000+ resumes optimized</span>
+            <span>⭐ 4.9/5 rating</span>
+          </div>
         </div>
-        <p className="text-sm text-text-muted mt-4">
-          🎯 No credit card required • ⭐ 5,000+ resumes optimized
-        </p>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
