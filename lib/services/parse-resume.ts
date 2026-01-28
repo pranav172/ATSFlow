@@ -162,10 +162,21 @@ function extractContactInfo(text: string): ResumeContact {
   }
 
   // Location (common patterns: City, State or City, Country)
-  const locationRegex = /([A-Z][a-z]+(?:\s[A-Z][a-z]+)*,\s*[A-Z]{2})/g;
-  const locationMatch = text.match(locationRegex);
-  if (locationMatch) {
-    contact.location = locationMatch[0];
+  // Look for patterns at the start of resume (first 500 chars) to avoid coursework
+  const headerText = text.slice(0, 500);
+  const locationRegex = /([A-Z][a-zA-Z\s]+,\s*[A-Z][a-zA-Z\s]*)/g;
+  const locationMatches = headerText.match(locationRegex);
+  if (locationMatches) {
+    // Filter out common false positives
+    const filtered = locationMatches.filter(
+      (loc) => !loc.includes('Data Structures') && 
+               !loc.includes('Computer') && 
+               !loc.includes('Information') &&
+               loc.length < 50
+    );
+    if (filtered.length > 0) {
+      contact.location = filtered[0];
+    }
   }
 
   return contact;

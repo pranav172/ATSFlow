@@ -163,7 +163,7 @@ export default async function ResumePage({ params }: ResumePageProps) {
             </CardHeader>
             <CardContent>
               <pre className="whitespace-pre-wrap text-sm text-text-secondary dark:text-slate-300 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg max-h-96 overflow-auto">
-                {resume.rawText?.slice(0, 1000)}...
+                {resume.rawText}
               </pre>
             </CardContent>
           </Card>
