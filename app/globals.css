@@ -21,7 +21,7 @@
 
   /* Dark Mode Overrides */
   .dark body {
-    @apply bg-dark-background text-dark-text-primary;
+    @apply bg-dark-background text-slate-100;
   }
 
   .dark {
@@ -117,7 +117,7 @@
 
   .input-field {
     @apply w-full px-4 py-3 border border-border dark:border-dark-border rounded-lg;
-    @apply bg-white dark:bg-dark-surface text-text-primary dark:text-dark-text-primary;
+    @apply bg-white dark:bg-dark-surface text-text-primary dark:text-slate-100;
     @apply focus:outline-none focus:ring-2 focus:ring-primary;
     @apply transition-all duration-150;
   }

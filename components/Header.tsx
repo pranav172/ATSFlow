@@ -16,13 +16,13 @@ export default function Header() {
           <nav className="hidden md:flex space-x-8">
             <Link 
               href="/" 
-              className="text-text-secondary dark:text-dark-text-secondary hover:text-primary transition-colors"
+              className="text-text-secondary dark:text-slate-300 hover:text-primary transition-colors"
             >
               Home
             </Link>
             <Link 
               href="/pricing" 
-              className="text-text-secondary dark:text-dark-text-secondary hover:text-primary transition-colors"
+              className="text-text-secondary dark:text-slate-300 hover:text-primary transition-colors"
             >
               Pricing
             </Link>

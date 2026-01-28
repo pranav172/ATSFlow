@@ -24,10 +24,10 @@ export default async function UploadPage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
+            <h1 className="text-4xl font-bold text-text-primary dark:text-slate-100 mb-2">
               Upload Your Resume
             </h1>
-            <p className="text-lg text-text-secondary dark:text-dark-text-secondary">
+            <p className="text-lg text-text-secondary dark:text-slate-300">
               Get your ATS score and optimization suggestions in seconds ⚡
             </p>
           </div>
@@ -52,7 +52,7 @@ export default async function UploadPage() {
                       <div className="text-3xl font-bold text-primary">
                         {creditsRemaining}
                       </div>
-                      <div className="text-xs text-text-muted dark:text-dark-text-muted">remaining</div>
+                      <div className="text-xs text-text-muted dark:text-slate-400">remaining</div>
                     </div>
                   )}
                 </div>

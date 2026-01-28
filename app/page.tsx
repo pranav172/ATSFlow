@@ -11,10 +11,10 @@ export default function Home() {
       
       <main className="flex items-center justify-center min-h-screen p-8">
         <div className="text-center space-y-6 max-w-4xl">
-          <h1 className="text-5xl md:text-6xl font-bold text-text-primary dark:text-dark-text-primary">
+          <h1 className="text-5xl md:text-6xl font-bold text-text-primary dark:text-slate-100">
             Beat the Bots. Land the Job.
           </h1>
-          <p className="text-xl md:text-2xl text-text-secondary dark:text-dark-text-secondary max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-text-secondary dark:text-slate-300 max-w-2xl mx-auto">
             AI-powered resume optimization that gets past applicant tracking systems and in front of hiring managers.
           </p>
           
@@ -36,7 +36,7 @@ export default function Home() {
             </SignedIn>
           </div>
           
-          <div className="flex gap-6 justify-center mt-6 text-sm text-text-muted dark:text-dark-text-muted flex-wrap">
+          <div className="flex gap-6 justify-center mt-6 text-sm text-text-muted dark:text-slate-400 flex-wrap">
             <span>⚡ No credit card required</span>
             <span>🎯 5,000+ resumes optimized</span>
             <span>⭐ 4.9/5 rating</span>
