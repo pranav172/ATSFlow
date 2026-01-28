@@ -12,8 +12,13 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
+  // Don't render anything on server to avoid hydration mismatch
   if (!mounted) {
-    return <div className="w-10 h-10" />; // Placeholder
+    return (
+      <div className="w-14 h-7 bg-slate-300 rounded-full p-1 opacity-50">
+        <div className="w-5 h-5 bg-white rounded-full" />
+      </div>
+    );
   }
 
   return (
