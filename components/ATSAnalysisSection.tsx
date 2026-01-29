@@ -86,7 +86,7 @@ export function ATSAnalysisSection({ resumeId, initialScore, initialAnalysis }: 
               <Button
                 onClick={handleAnalyze}
                 disabled={isAnalyzing}
-                variant="outline"
+                variant="secondary"
                 className="min-w-32"
               >
                 Re-analyze
