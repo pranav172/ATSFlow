@@ -85,6 +85,7 @@ export async function analyzeResume(
     console.log(`Groq optimizations: ${analysis.improvements.length} suggestions`);
   } catch (error) {
     console.error('Groq failed, proceeding without optimizations:', error);
+    // Continue with basic analysis
   }
 
 
