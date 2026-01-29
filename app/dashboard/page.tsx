@@ -125,7 +125,7 @@ export default async function DashboardPage() {
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-text-primary dark:text-slate-100 truncate">
-                              {resume.fileName}
+                              {resume.originalFilename}
                             </p>
                             <p className="text-sm text-text-secondary dark:text-slate-400">
                               Analyzed {new Date(resume.createdAt).toLocaleDateString()}
@@ -144,29 +144,6 @@ export default async function DashboardPage() {
                 </div>
               )}
             </CardContent>
-          </Card>
-
-          {/* App Showcase */}
-          <Card className="bg-white dark:bg-dark-surface overflow-hidden">
-            <CardHeader>
-              <CardTitle>ATSFlow in Action 🚀</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-lg overflow-hidden border border-border dark:border-slate-700">
-                <Image
-                  src="/app-showcase.png"
-                  alt="ATSFlow Comprehensive Analysis Report"
-                  width={1200}
-                  height={600}
-                  className="w-full h-auto"
-                  priority
-                />
-              </div>
-              <p className="text-sm text-text-secondary dark:text-slate-400 mt-4 text-center">
-                Get comprehensive AI-powered analysis with job predictions, skill gaps, and career insights
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </main>
     </div>
