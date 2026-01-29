@@ -65,37 +65,37 @@ export default async function UploadPage() {
 
           {/* Info Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-white">
+            <Card className="bg-white dark:bg-dark-surface">
               <CardContent className="pt-6 text-center">
                 <div className="text-2xl mb-2">⚡</div>
-                <h3 className="font-semibold text-text-primary mb-1">
+                <h3 className="font-semibold text-text-primary dark:text-slate-100 mb-1">
                   Instant Analysis
                 </h3>
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-text-secondary dark:text-slate-300">
                   ATS score in under 5 seconds
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white">
+            <Card className="bg-white dark:bg-dark-surface">
               <CardContent className="pt-6 text-center">
                 <div className="text-2xl mb-2">🎯</div>
-                <h3 className="font-semibold text-text-primary mb-1">
+                <h3 className="font-semibold text-text-primary dark:text-slate-100 mb-1">
                   Precise Fixes
                 </h3>
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-text-secondary dark:text-slate-300">
                   Actionable improvements for every section
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white">
+            <Card className="bg-white dark:bg-dark-surface">
               <CardContent className="pt-6 text-center">
                 <div className="text-2xl mb-2">🔒</div>
-                <h3 className="font-semibold text-text-primary mb-1">
+                <h3 className="font-semibold text-text-primary dark:text-slate-100 mb-1">
                   100% Private
                 </h3>
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-text-secondary dark:text-slate-300">
                   Your data is encrypted and never shared
                 </p>
               </CardContent>
@@ -103,22 +103,22 @@ export default async function UploadPage() {
           </div>
 
           {/* FAQ */}
-          <Card className="bg-white">
+          <Card className="bg-white dark:bg-dark-surface">
             <CardHeader>
               <CardTitle>Acceptable Formats</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-text-secondary">
+            <CardContent className="space-y-3 text-sm text-text-secondary dark:text-slate-300">
               <div className="flex items-start gap-2">
                 <span className="text-success">✓</span>
                 <div>
-                  <strong className="text-text-primary">PDF</strong> - Preferred format,
+                  <strong className="text-text-primary dark:text-slate-100">PDF</strong> - Preferred format,
                   must be text-based (not scanned images)
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-success">✓</span>
                 <div>
-                  <strong className="text-text-primary">DOCX</strong> - Microsoft Word
+                  <strong className="text-text-primary dark:text-slate-100">DOCX</strong> - Microsoft Word
                   2007+ (.docx only, not .doc)
                 </div>
               </div>
