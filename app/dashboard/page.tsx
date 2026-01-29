@@ -7,7 +7,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import Image from 'next/image';
 
 export default async function DashboardPage() {
   const user = await getOrCreateUser();
