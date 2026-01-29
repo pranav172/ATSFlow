@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { resumes, optimizationLogs } from '@/lib/db/schema';
+import { resumes } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { calculateATSScore } from './ats-scorer';
 import { analyzeWithGemini, generateOptimizationsWithGroq } from './ai-provider';
@@ -89,8 +89,17 @@ export async function analyzeResume(
 
   const latencyMs = Date.now() - startTime;
 
-  // 5. Calculate final score (blend rule-based + AI suggestion)
-  const finalScore = Math.round((atsScore.totalScore + analysis.suggestedScore) / 2);
+  // 5. Calculate final score
+  // If AI provided a suggestion, blend it (70% rule-based, 30% AI)
+  // Otherwise, use 100% rule-based score
+  let finalScore: number;
+  if (analysis.suggestedScore > 0 && analysis.suggestedScore !== atsScore.totalScore) {
+    finalScore = Math.round(atsScore.totalScore * 0.7 + analysis.suggestedScore * 0.3);
+  } else {
+    finalScore = atsScore.totalScore;
+  }
+
+  console.log(`Final ATS Score: ${finalScore}/100 (Rule-based: ${atsScore.totalScore}, AI: ${analysis.suggestedScore || 'N/A'})`);
 
   // 6. Update resume with analysis results
   await db

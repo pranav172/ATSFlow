@@ -56,6 +56,7 @@ export function calculateATSScore(
 
 /**
  * Score contact information completeness (15 points max)
+ * STRICT: Real ATS systems are very picky about contact info
  */
 function scoreContactInfo(structured: StructuredResume) {
   const issues: string[] = [];
@@ -65,21 +66,31 @@ function scoreContactInfo(structured: StructuredResume) {
   if (structured.contact.email) {
     score += 5;
   } else {
-    issues.push('Missing email address');
+    issues.push('❌ CRITICAL: Missing email address - auto-reject by most ATS');
   }
 
   // Phone (5 pts)
   if (structured.contact.phone) {
     score += 5;
   } else {
-    issues.push('Missing phone number');
+    issues.push('❌ CRITICAL: Missing phone number - auto-reject by most ATS');
   }
 
-  // LinkedIn or GitHub (5 pts)
+  // LinkedIn or GitHub (5 pts) - but must be CLICKABLE links
   if (structured.contact.linkedin || structured.contact.github) {
-    score += 5;
+    // Check if they're actual URLs (not just text like "LinkedIn")
+    const hasValidLink = 
+      (structured.contact.linkedin?.startsWith('http')) || 
+      (structured.contact.github?.startsWith('http'));
+    
+    if (hasValidLink) {
+      score += 5;
+    } else {
+      score += 2; // Partial credit for having the field
+      issues.push('⚠️  LinkedIn/GitHub not clickable URLs - many ATS cannot parse these');
+    }
   } else {
-    issues.push('Add LinkedIn or GitHub profile');
+    issues.push('⚠️  Add LinkedIn or GitHub profile URL');
   }
 
   return { score, max: 15, issues };
@@ -87,25 +98,29 @@ function scoreContactInfo(structured: StructuredResume) {
 
 /**
  * Score keyword usage and technical skills (30 points max)
+ * STRICT: Top MNCs use keyword matching heavily
  */
 function scoreKeywords(resumeText: string, structured: StructuredResume) {
   const issues: string[] = [];
   let score = 0;
 
-  // Technical skills count (15 pts)
+  // Technical skills count (15 pts) - MUCH STRICTER
   const skillCount = structured.skills.length;
-  if (skillCount >= 10) {
+  if (skillCount >= 15) {
     score += 15;
+  } else if (skillCount >= 10) {
+    score += 12;
+    issues.push(`⚠️  Only ${skillCount} skills detected - top candidates have 15+`);
   } else if (skillCount >= 5) {
-    score += 10;
-    issues.push(`Add ${10 - skillCount} more technical skills`);
+    score += 8;
+    issues.push(`⚠️  Too few skills (${skillCount}) - add more technical keywords`);
   } else {
-    score += 5;
-    issues.push('Add more technical skills (aim for 10+)');
+    score += 3;
+    issues.push('❌ CRITICAL: Very few skills detected - likely auto-rejected');
   }
 
-  // Action verbs (5 pts)
-  const actionVerbs = [
+  // Action verbs (5 pts) - STRICTER
+   const actionVerbs = [
     'developed',
     'built',
     'implemented',
@@ -116,27 +131,48 @@ function scoreKeywords(resumeText: string, structured: StructuredResume) {
     'managed',
     'led',
     'achieved',
+    'deployed',
+    'architected',
   ];
   const verbCount = actionVerbs.filter((verb) =>
     resumeText.toLowerCase().includes(verb)
   ).length;
 
-  if (verbCount >= 5) {
+  if (verbCount >= 8) {
     score += 5;
-  } else if (verbCount >= 3) {
+  } else if (verbCount >= 5) {
     score += 3;
-    issues.push('Use more action verbs (developed, implemented, optimized)');
+    issues.push('⚠️  Use more strong action verbs (developed, implemented, optimized)');
   } else {
     score += 1;
-    issues.push('Use strong action verbs to start bullet points');
+    issues.push('❌ Too few action verbs - bullet points seem weak');
   }
 
-  // Quantifiable achievements (10 pts)
-  const hasNumbers = /\d+(\.\d+)?%|\d+\+|\d+x/g.test(resumeText);
-  if (hasNumbers) {
+  // Quantifiable achievements (10 pts) - MUCH STRICTER
+  const numberPatterns = [
+    /\d+%/g, // percentages
+    /\d+\+/g, // numbers with +
+    /\d+x/g, // multipliers
+    /\d+k/gi, // thousands
+    /\d{1,3}(,\d{3})*/g, // large numbers with commas
+  ];
+  
+  let metricsCount = 0;
+  numberPatterns.forEach(pattern => {
+    const matches = resumeText.match(pattern);
+    if (matches) metricsCount += matches.length;
+  });
+
+  if (metricsCount >= 8) {
     score += 10;
+  } else if (metricsCount >= 5) {
+    score += 7;
+    issues.push(`⚠️  Only ${metricsCount} quantifiable metrics - top resumes have 10+`);
+  } else if (metricsCount >= 2) {
+    score += 4;
+    issues.push(`❌ Only ${metricsCount} metrics found - add numbers to show impact`);
   } else {
-    issues.push('Add quantifiable achievements (e.g., "Improved performance by 40%")');
+    issues.push('❌ CRITICAL: No quantifiable achievements - resume appears generic');
   }
 
   return { score, max: 30, issues };
@@ -182,46 +218,68 @@ function scoreSectionCompleteness(structured: StructuredResume) {
 
 /**
  * Score formatting and readability (20 points max)
+ * STRICT: ATS systems prefer specific formatting styles
  */
-function scoreFormatting(resumeText: string, structured: StructuredResume) {
+function scoreFormatting(resumeText: string, _structured: StructuredResume) {
   const issues: string[] = [];
   let score = 0;
 
-  // Bullet points usage (5 pts)
+  // Bullet points usage (5 pts) - STRICTER
   const bulletCount = (resumeText.match(/[•\-\*]\s/g) || []).length;
-  if (bulletCount >= 5) {
+  if (bulletCount >= 10) {
     score += 5;
-  } else if (bulletCount >= 3) {
+  } else if (bulletCount >= 5) {
     score += 3;
-    issues.push('Use more bullet points for achievements');
+    issues.push(`⚠️  Only ${bulletCount} bullet points - use more (10+ recommended)`);
   } else {
-    issues.push('Use bullet points instead of paragraphs');
+    score += 1;
+    issues.push('❌ Too few bullet points - ATS prefers bulleted lists over paragraphs');
   }
 
-  // Length check (5 pts) - ideal 1-2 pages (~500-1500 words)
+  // Length check (5 pts) - ideal 1-2 pages (~400-1200 words)
   const wordCount = resumeText.split(/\s+/).length;
-  if (wordCount >= 300 && wordCount <= 1500) {
+  if (wordCount >= 400 && wordCount <= 1200) {
     score += 5;
-  } else if (wordCount > 1500) {
-    score += 3;
-    issues.push('Resume too long - aim for 1-2 pages');
+  } else if (wordCount > 1200) {
+    score += 2;
+    issues.push(`⚠️  Resume too long (${wordCount} words) - ATS may truncate content`);
   } else {
     score += 2;
-    issues.push('Resume too short - add more details');
+    issues.push(`⚠️  Resume too short (${wordCount} words) - add more detail`);
   }
 
-  // Consistent formatting (10 pts) - check for common issues
-  score += 10; // Assume good by default
-  if (resumeText.includes('  ')) {
-    score -= 2;
-    issues.push('Remove extra spaces');
+  // LaTeX formatting artifacts (10 pts deduction if found)
+  score += 10; // Start with full points
+  const latexArtifacts = [
+    /\\[a-z]+\{/gi, // LaTeX commands
+    /\[.*?\]\(.*?\)/g, // Markdown/LaTeX links  
+  ];
+  
+  let hasLatexIssues = false;
+  latexArtifacts.forEach(pattern => {
+    if (pattern.test(resumeText)) {
+      hasLatexIssues = true;
+    }
+  });
+
+  if (hasLatexIssues) {
+    score -= 5;
+    issues.push('❌ CRITICAL: LaTeX formatting detected - most ATS cannot parse this correctly');
   }
 
-  return { score, max: 20, issues };
+  // Check for non-clickable project links like [Live API], [Demo], [Kaggle]
+  const hasNonClickableLinks = /\[(Live|Demo|GitHub|Kaggle|Link|Live API)\]/gi.test(resumeText);
+  if (hasNonClickableLinks) {
+    score -= 3;
+    issues.push('❌ Project links not clickable - replace [Demo] with actual URLs');
+  }
+
+  return { score: Math.max(0, score), max: 20, issues };
 }
 
 /**
  * Score ATS compatibility (10 points max)
+ * STRICT: Real ATS systems have specific requirements
  */
 function scoreATSCompatibility(resumeText: string) {
   const issues: string[] = [];
@@ -231,15 +289,26 @@ function scoreATSCompatibility(resumeText: string) {
   const standardHeaders = ['experience', 'education', 'skills'];
   const lowerText = resumeText.toLowerCase();
   
+  let missingHeaders = 0;
   standardHeaders.forEach((header) => {
     if (!lowerText.includes(header)) {
-      score -= 2;
-      issues.push(`Use standard header: "${header}"`);
+      score -= 3;
+      missingHeaders++;
+      issues.push(`❌ Missing standard "${header}" section header`);
     }
   });
 
-  // Ensure clean text extraction (already done if we got here)
-  // This is validated during parsing
+  // Check for problematic formatting that ATS hates
+  if (resumeText.includes('|') && resumeText.split('|').length > 5) {
+    score -= 2;
+    issues.push('⚠️  Excessive use of "|" separator - may confuse ATS parsers');
+  }
+
+  // Check for proper spacing
+  if (resumeText.includes('  ')) {
+    score -= 1;
+    issues.push('⚠️  Extra spaces detected - clean up formatting');
+  }
 
   return { score: Math.max(0, score), max: 10, issues };
 }
