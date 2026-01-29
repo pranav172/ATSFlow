@@ -87,7 +87,7 @@ export async function analyzeResume(
     console.error('Groq failed, proceeding without optimizations:', error);
   }
 
-  const latencyMs = Date.now() - startTime;
+
 
   // 5. Calculate final score
   // If AI provided a suggestion, blend it (70% rule-based, 30% AI)
