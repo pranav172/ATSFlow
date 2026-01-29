@@ -167,29 +167,6 @@ export default async function DashboardPage() {
               </p>
             </CardContent>
           </Card>
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Link href="/upload">
-              <Card className="bg-gradient-to-br from-primary to-primary-dark hover:shadow-lg transition-shadow cursor-pointer h-full">
-                <CardContent className="pt-6 text-center text-white">
-                  <div className="text-4xl mb-3">📤</div>
-                  <h3 className="font-semibold text-lg mb-2">Upload Resume</h3>
-                  <p className="text-sm opacity-90">Analyze a new resume</p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link href="/showcase">
-              <Card className="bg-gradient-to-br from-success to-success/80 hover:shadow-lg transition-shadow cursor-pointer h-full">
-                <CardContent className="pt-6 text-center text-white">
-                  <div className="text-4xl mb-3">🎨</div>
-                  <h3 className="font-semibold text-lg mb-2">View Showcase</h3>
-                  <p className="text-sm opacity-90">See example analyses</p>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
         </div>
       </main>
     </div>

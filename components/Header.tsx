@@ -9,6 +9,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
+            <img src="/icon-192.png" alt="ATSFlow" className="w-8 h-8 rounded-lg" />
             <span className="text-2xl font-bold text-primary">ATSFlow</span>
           </Link>
 
