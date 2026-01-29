@@ -143,14 +143,14 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
 
       {/* Job Role Predictions */}
       {jobPredictions ? (
-        <Card>
+        <Card className="bg-white dark:bg-dark-surface">
           <CardHeader>
             <CardTitle>🎯 Best Suited Job Roles</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {jobPredictions.roles.map((role, idx) => (
-                <div key={idx} className="border dark:border-slate-700 rounded-lg p-4">
+                <div key={idx} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h4 className="font-semibold text-lg text-text-primary dark:text-slate-100">
@@ -165,7 +165,7 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-3">
-                    <Badge className="bg-primary/10 text-primary">
+                    <Badge className="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light">
                       Experience: {jobPredictions.experienceLevel}
                     </Badge>
                     {role.companies.slice(0, 3).map((company, i) => (
@@ -180,7 +180,7 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="bg-white dark:bg-dark-surface">
           <CardContent className="py-12 text-center">
             <p className="text-text-muted dark:text-slate-400 mb-4">
               🤖 Click "Generate AI Insights" to get job role predictions
@@ -194,14 +194,14 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
 
       {/* Project Impact Analysis */}
       {projectImpact && projectImpact.length > 0 && (
-        <Card>
+        <Card className="bg-white dark:bg-dark-surface">
           <CardHeader>
             <CardTitle>💼 Project Impact Analysis</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {projectImpact.map((project, idx) => (
-                <div key={idx} className="border dark:border-slate-700 rounded-lg p-4">
+                <div key={idx} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
                   <div className="flex items-start justify-between mb-3">
                     <h4 className="font-semibold text-text-primary dark:text-slate-100">
                       {project.projectName}
@@ -221,14 +221,14 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
                   
                   <div className="flex flex-wrap gap-2 mb-3">
                     {project.technologies.map((tech, i) => (
-                      <Badge key={i} className="bg-primary/10 text-primary text-xs">
+                      <Badge key={i} className="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light text-xs">
                         {tech}
                       </Badge>
                     ))}
                   </div>
                   
                   {project.suggestions.length > 0 && (
-                    <div className="mt-3 pt-3 border-t dark:border-slate-700">
+                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
                       <p className="text-xs font-semibold text-text-muted dark:text-slate-400 mb-2">
                         Suggestions to highlight:
                       </p>
@@ -250,7 +250,7 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
 
       {/* Skill Gap Analysis */}
       {skillGaps && (
-        <Card>
+        <Card className="bg-white dark:bg-dark-surface">
           <CardHeader>
             <CardTitle>🔧 Skill Gap Analysis</CardTitle>
           </CardHeader>
@@ -260,7 +260,7 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
                 <h4 className="font-semibold text-success mb-3">✅ Skills You Have</h4>
                 <div className="flex flex-wrap gap-2">
                   {skillGaps.present.slice(0, 15).map((skill, idx) => (
-                    <Badge key={idx} className="bg-success/10 text-success border border-success/20">
+                    <Badge key={idx} className="bg-success/10 text-success border border-success/20 dark:bg-success/20 dark:border-success/30">
                       {skill}
                     </Badge>
                   ))}
@@ -298,7 +298,7 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
 
       {/* Career Trajectory */}
       {careerInsights && (
-        <Card>
+        <Card className="bg-white dark:bg-dark-surface">
           <CardHeader>
             <CardTitle>🚀 Career Trajectory Insights</CardTitle>
           </CardHeader>
@@ -342,19 +342,19 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
 
       {/* Full detailed breakdown - Existing analysis */}
       {atsAnalysis?.breakdown && (
-        <Card>
+        <Card className="bg-white dark:bg-dark-surface">
           <CardHeader>
             <CardTitle>📋 Detailed ATS Breakdown</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {Object.entries(atsAnalysis.breakdown).map(([category, data]: [string, any]) => (
-                <div key={category} className="border-b dark:border-slate-700 last:border-0 pb-4 last:pb-0">
+                <div key={category} className="border-b border-slate-200 dark:border-slate-700 last:border-0 pb-4 last:pb-0">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-semibold text-text-primary dark:text-slate-100 capitalize">
                       {category.replace(/([A-Z])/g, ' $1').trim()}
                     </span>
-                    <span className="text-sm font-bold">
+                    <span className="text-sm font-bold text-text-primary dark:text-slate-100">
                       {data.score}/{data.max}
                     </span>
                   </div>
