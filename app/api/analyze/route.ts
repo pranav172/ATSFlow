@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Check user credits (free users get 1 free analysis)
-    if (user.freeAnalysisCredits <= 0 && user.subscriptionTier === 'free') {
+    if ((user.creditsRemaining ?? 0) <= 0 && user.subscriptionTier === 'free') {
       return NextResponse.json(
         {
           error: 'No credits remaining. Upgrade to Pro for unlimited analyses.',
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       await db
         .update(users)
         .set({
-          freeAnalysisCredits: Math.max(0, user.freeAnalysisCredits - 1),
+          creditsRemaining: Math.max(0, (user.creditsRemaining ?? 0) - 1),
         })
         .where(eq(users.id, user.id));
     }
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       analysis: result.analysis,
       creditsRemaining:
         user.subscriptionTier === 'free'
-          ? Math.max(0, user.freeAnalysisCredits - 1)
+          ? Math.max(0, (user.creditsRemaining ?? 0) - 1)
           : 'unlimited',
     });
   } catch (error: any) {
