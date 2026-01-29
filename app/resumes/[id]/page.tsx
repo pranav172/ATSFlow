@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { CircularProgress } from '@/components/ui/Progress';
+import { ATSAnalysisSection } from '@/components/ATSAnalysisSection';
 
 interface ResumePageProps {
   params: Promise<{
@@ -33,6 +33,7 @@ export default async function ResumePage({ params }: ResumePageProps) {
   }
 
   const structured = resume.structuredContent as any;
+  const atsAnalysis = resume.atsAnalysis as any;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-white to-violet-50 dark:from-dark-background dark:via-dark-surface dark:to-purple-950/20 transition-colors duration-300">
@@ -50,23 +51,12 @@ export default async function ResumePage({ params }: ResumePageProps) {
             </p>
           </div>
 
-          {/* ATS Score Card */}
-          <Card className="bg-white dark:bg-dark-surface">
-            <CardHeader>
-              <CardTitle>ATS Score</CardTitle>
-              <p className="text-sm text-text-muted dark:text-slate-400">
-                Coming in Phase 7 - AI Analysis
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-center py-8">
-                <CircularProgress value={0} size={150} strokeWidth={12} />
-              </div>
-              <p className="text-center text-sm text-text-muted dark:text-slate-400 mt-4">
-                AI analysis will be implemented in the next phase
-              </p>
-            </CardContent>
-          </Card>
+          {/* ATS Analysis Section */}
+          <ATSAnalysisSection 
+            resumeId={resume.id}
+            initialScore={resume.atsScore || undefined}
+            initialAnalysis={atsAnalysis}
+          />
 
           {/* Contact Info Card */}
           {structured?.contact && (
