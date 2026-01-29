@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { ATSAnalysisSection } from '@/components/ATSAnalysisSection';
+import { AddLinksSection } from '@/components/AddLinksSection';
 
 interface ResumePageProps {
   params: Promise<{
@@ -34,6 +35,7 @@ export default async function ResumePage({ params }: ResumePageProps) {
 
   const structured = resume.structuredContent as any;
   const atsAnalysis = resume.atsAnalysis as any;
+  const manualLinks = structured?.manualLinks || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-white to-violet-50 dark:from-dark-background dark:via-dark-surface dark:to-purple-950/20 transition-colors duration-300">
@@ -56,6 +58,12 @@ export default async function ResumePage({ params }: ResumePageProps) {
             resumeId={resume.id}
             initialScore={resume.atsScore || undefined}
             initialAnalysis={atsAnalysis}
+          />
+
+          {/* Add Important Links Section */}
+          <AddLinksSection 
+            resumeId={resume.id}
+            initialLinks={manualLinks}
           />
 
           {/* Contact Info Card */}
