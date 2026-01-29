@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrCreateUser } from '@/lib/services/user-sync';
 import { analyzeResume } from '@/lib/services/analyze-resume';
-import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
