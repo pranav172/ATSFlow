@@ -1,6 +1,7 @@
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { ThemeToggle } from './ThemeToggle';
+import { MobileMenu } from './MobileMenu';
 
 export default function Header() {
   return (
@@ -46,6 +47,7 @@ export default function Header() {
                 },
               }}
             />
+            <MobileMenu />
           </div>
         </div>
       </div>
