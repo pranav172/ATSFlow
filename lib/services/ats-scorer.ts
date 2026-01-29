@@ -27,7 +27,7 @@ export function calculateATSScore(
   structured: StructuredResume
 ): ATSScore {
   const breakdown: ATSScoreBreakdown = {
-    contact: scoreContactInfo(structured),
+    contact: scoreContactInfo(structured, resumeText),
     keywords: scoreKeywords(resumeText, structured),
     sections: scoreSectionCompleteness(structured),
     formatting: scoreFormatting(resumeText, structured),
@@ -55,10 +55,45 @@ export function calculateATSScore(
 }
 
 /**
+ * Detect embedded link patterns that suggest clickable links in PDFs
+ * Common in LaTeX/Overleaf resumes where links are embedded but text shows patterns
+ */
+function detectEmbeddedLinkPatterns(resumeText: string): string[] {
+  const patterns = [
+    /\[([^\]]+)\]/g,                    // [Demo], [Live], [GitHub]
+    /GitHub:\s*[\w-]+/gi,               // GitHub: username (not full URL)
+    /LinkedIn:\s*[\w-]+/gi,             // LinkedIn: profile (not full URL)
+    /Portfolio:\s*[\w.-]+/gi,           // Portfolio: site
+    /Demo:\s*[\w.-]+/gi,                // Demo: link
+    /Project:\s*[\w.-]+/gi,             // Project: link
+    /(?:https?:\/\/)?github\.com\/[\w-]+(?!\/[\w-])/gi,  // Partial GitHub URLs
+  ];
+  
+  const found: string[] = [];
+  const foundSet = new Set<string>(); // Avoid duplicates
+  
+  patterns.forEach(pattern => {
+    const matches = resumeText.matchAll(pattern);
+    for (const match of matches) {
+      const text = match[0].trim();
+      // Only add if it looks like a placeholder, not a full URL
+      if (!text.startsWith('http') || !text.includes('.com/')) {
+        if (!foundSet.has(text)) {
+          foundSet.add(text);
+          found.push(text);
+        }
+      }
+    }
+  });
+  
+  return found;
+}
+
+/**
  * Score contact information completeness (15 points max)
  * STRICT: Real ATS systems are very picky about contact info
  */
-function scoreContactInfo(structured: StructuredResume) {
+function scoreContactInfo(structured: StructuredResume, resumeText: string) {
   const issues: string[] = [];
   let score = 0;
 
@@ -91,6 +126,16 @@ function scoreContactInfo(structured: StructuredResume) {
     }
   } else {
     issues.push('⚠️  Missing professional links → Add LinkedIn (https://linkedin.com/in/yourname) or GitHub (https://github.com/username) - increases ATS score by 5%');
+  }
+
+  // DETECT EMBEDDED LINK PATTERNS (common in LaTeX PDFs)
+  const embeddedPatterns = detectEmbeddedLinkPatterns(resumeText);
+  if (embeddedPatterns.length > 0) {
+    const examples = embeddedPatterns.slice(0, 3).join(', ');
+    issues.push(
+      `🔗 EMBEDDED LINKS DETECTED: Found "${examples}" - These appear to be embedded PDF links that ATS CANNOT READ! ` +
+      `Add actual URLs as visible text: Change "[Demo]" → "Demo: https://myproject.com" or use the "Add Links" section below.`
+    );
   }
 
   return { score, max: 15, issues };
