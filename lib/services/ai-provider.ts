@@ -147,7 +147,7 @@ Focus on the most impactful changes. Be specific and actionable.`;
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile',
+        model: 'llama-3.3-70b-versatile', // Updated model
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.5,
         max_tokens: 1024,

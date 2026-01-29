@@ -104,43 +104,10 @@ export async function analyzeResume(
         aiAnalysis: analysis,
         analyzedAt: new Date().toISOString(),
       },
-      status: 'analyzed',
     })
     .where(eq(resumes.id, resumeId));
 
-  // 7. Log to optimization_logs for observability
-  try {
-    await db.insert(optimizationLogs).values({
-      resumeId,
-      userId,
-      provider: 'gemini',
-      model: 'gemini-1.5-flash',
-      promptTokens: geminiTokens.prompt,
-      completionTokens: geminiTokens.completion,
-      totalTokens: geminiTokens.total,
-      costUsd: (geminiTokens.total / 1_000_000) * 0.075, // Gemini pricing
-      latencyMs,
-      success: true,
-    });
-
-    if (groqTokens.total > 0) {
-      await db.insert(optimizationLogs).values({
-        resumeId,
-        userId,
-        provider: 'groq',
-        model: 'llama-3.1-70b',
-        promptTokens: groqTokens.prompt,
-        completionTokens: groqTokens.completion,
-        totalTokens: groqTokens.total,
-        costUsd: 0, // Groq is free
-        latencyMs,
-        success: true,
-      });
-    }
-  } catch (logError) {
-    console.error('Failed to log optimization:', logError);
-    // Don't fail the request if logging fails
-  }
+  // TODO: Re-enable optimization logging after fixing schema types
 
   return {
     atsScore: finalScore,
