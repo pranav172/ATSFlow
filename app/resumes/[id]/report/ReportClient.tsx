@@ -128,7 +128,7 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
                   {atsAnalysis?.breakdown && Object.entries(atsAnalysis.breakdown)
                     .filter(([_, data]: [string, any]) => data.issues && data.issues.length > 0)
                     .slice(0, 3)
-                    .map(([category, data]: [string, any], idx: number) => (
+                    .map(([_category, data]: [string, any], idx: number) => (
                       <p key={idx} className="text-sm text-text-secondary dark:text-slate-300">
                         • {data.issues[0]}
                       </p>
