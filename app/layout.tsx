@@ -22,10 +22,32 @@ export const metadata: Metadata = {
   description: "AI-powered resume optimization that gets past applicant tracking systems and in front of hiring managers.",
   keywords: ["ATS", "resume optimization", "AI resume", "job application", "career tools"],
   authors: [{ name: "ATSFlow" }],
+  manifest: "/manifest.json",
+  themeColor: "#8b5cf6",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ATSFlow",
+  },
   openGraph: {
     title: "ATSFlow - AI-Powered Resume Optimization",
     description: "Beat the ATS. Land the interview.",
     type: "website",
+  },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
   },
 };
 

@@ -21,6 +21,12 @@ export default function Header() {
               Home
             </Link>
             <Link 
+              href="/dashboard" 
+              className="text-text-secondary dark:text-slate-300 hover:text-primary transition-colors"
+            >
+              Dashboard
+            </Link>
+            <Link 
               href="/pricing" 
               className="text-text-secondary dark:text-slate-300 hover:text-primary transition-colors"
             >
