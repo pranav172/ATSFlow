@@ -77,8 +77,15 @@ export function AddLinksSection({ resumeId, initialLinks = [], parsedContact, on
       }
 
       setIsEditing(false);
-      onLinksUpdated?.();
+      
+      // Trigger re-analysis by refreshing the page
+      // This will show updated ATS score with the newly added links
+      if (onLinksUpdated) {
+        onLinksUpdated();
+      }
+      window.location.reload(); // Force full page reload to re-analyze
     } catch (error) {
+      console.error('Error saving links:', error);
       alert('Failed to save links. Please try again.');
     } finally {
       setIsSaving(false);

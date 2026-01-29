@@ -12,6 +12,8 @@ export interface AIAnalysisResult {
     suggestion: string;
     priority: 'high' | 'medium' | 'low';
   }>;
+  breakdown?: any; // Detailed breakdown from ATS scorer
+  grade?: 'Excellent' | 'Good' | 'Fair' | 'Poor'; // Overall grade
 }
 
 /**

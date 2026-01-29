@@ -121,6 +121,10 @@ export async function analyzeResume(
   return {
     atsScore: finalScore,
     grade: atsScore.grade,
-    analysis,
+    analysis: {
+      ...analysis,
+      breakdown: atsScore.breakdown, // Include detailed breakdown for UI
+      grade: atsScore.grade,
+    },
   };
 }
