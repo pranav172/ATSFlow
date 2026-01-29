@@ -43,14 +43,27 @@ export default async function ResumePage({ params }: ResumePageProps) {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-8">
-          {/* Header */}
-          <div>
-            <h1 className="text-4xl font-bold text-text-primary dark:text-slate-100 mb-2">
-              Resume Analysis
-            </h1>
-            <p className="text-lg text-text-secondary dark:text-slate-300">
-              {resume.originalFilename}
-            </p>
+          {/* Header with Report Link */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-text-primary dark:text-slate-100 mb-2">
+                Resume Analysis
+              </h1>
+              <p className="text-lg text-text-secondary dark:text-slate-300">
+                {resume.originalFilename}
+              </p>
+            </div>
+            {resume.atsScore && (
+              <a 
+                href={`/resumes/${resume.id}/report`}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-semibold"
+              >
+                📊 View Full Report
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            )}
           </div>
 
           {/* ATS Analysis Section */}
