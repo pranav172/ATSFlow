@@ -36,7 +36,7 @@ export async function analyzeResume(
   }
 
   // 2. Calculate rule-based ATS score
-  const startTime = Date.now();
+
   const atsScore = calculateATSScore(
     resume.rawText,
     resume.structuredContent as any
