@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrCreateUser } from '@/lib/services/user-sync';
 import { analyzeResume } from '@/lib/services/analyze-resume';
-import { users } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
