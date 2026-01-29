@@ -14,7 +14,7 @@ interface RouteContext {
  * Generate comprehensive AI-powered report for a resume
  * Includes: job predictions, project analysis, skill gaps, career insights
  */
-export async function POST(request: Request, context: RouteContext) {
+export async function POST(_request: Request, context: RouteContext) {
   try {
     const user = await getOrCreateUser();
     if (!user) {
