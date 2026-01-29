@@ -68,7 +68,6 @@ export default function ReportClient({ initialData }: { initialData: ReportData 
   };
 
   const { resume, atsScore, atsAnalysis, jobPredictions, projectImpact, skillGaps, careerInsights } = reportData;
-  const structured = resume.structuredContent;
 
   return (
     <div className="space-y-8">
