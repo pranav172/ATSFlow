@@ -87,10 +87,10 @@ function scoreContactInfo(structured: StructuredResume) {
       score += 5;
     } else {
       score += 2; // Partial credit for having the field
-      issues.push('⚠️  LinkedIn/GitHub not clickable URLs - many ATS cannot parse these');
+      issues.push('⚠️  LinkedIn/GitHub not clickable URLs - Add like: https://linkedin.com/in/yourname');
     }
   } else {
-    issues.push('⚠️  Add LinkedIn or GitHub profile URL');
+    issues.push('⚠️  Missing professional links → Add LinkedIn (https://linkedin.com/in/yourname) or GitHub (https://github.com/username) - increases ATS score by 5%');
   }
 
   return { score, max: 15, issues };
@@ -110,13 +110,13 @@ function scoreKeywords(resumeText: string, structured: StructuredResume) {
     score += 15;
   } else if (skillCount >= 10) {
     score += 12;
-    issues.push(`⚠️  Only ${skillCount} skills detected - top candidates have 15+`);
+    issues.push(`⚠️  Only ${skillCount} skills detected - top MNC candidates have 15+. Add: Programming languages, frameworks, tools, methodologies (e.g., Python, React, Docker, Agile)`);
   } else if (skillCount >= 5) {
     score += 8;
-    issues.push(`⚠️  Too few skills (${skillCount}) - add more technical keywords`);
+    issues.push(`⚠️  Too few skills (${skillCount}) - Add technical skills section with: Languages (Python, Java), Frameworks (React, Node.js), Tools (Git, Docker), Cloud (AWS, Azure)`);
   } else {
     score += 3;
-    issues.push('❌ CRITICAL: Very few skills detected - likely auto-rejected');
+    issues.push('❌ CRITICAL: Very few skills detected - Add a "Technical Skills" section with 10-15 relevant technologies you know. Example: "Python, JavaScript, React, Node.js, PostgreSQL, Docker, AWS, Git, Agile, REST APIs"');
   }
 
   // Action verbs (5 pts) - STRICTER
@@ -142,10 +142,10 @@ function scoreKeywords(resumeText: string, structured: StructuredResume) {
     score += 5;
   } else if (verbCount >= 5) {
     score += 3;
-    issues.push('⚠️  Use more strong action verbs (developed, implemented, optimized)');
+    issues.push('⚠️  Use strong action verbs → Start bullets with: "Developed", "Implemented", "Optimized", "Led", "Architected", "Deployed" instead of weak verbs like "Worked on", "Helped with"');
   } else {
     score += 1;
-    issues.push('❌ Too few action verbs - bullet points seem weak');
+    issues.push('❌ Weak bullet points - Start each with power verbs: "Developed scalable API", "Led team of 5 engineers", "Optimized database performance by 40%" NOT "Worked on projects", "Responsible for tasks"');
   }
 
   // Quantifiable achievements (10 pts) - MUCH STRICTER
@@ -167,12 +167,12 @@ function scoreKeywords(resumeText: string, structured: StructuredResume) {
     score += 10;
   } else if (metricsCount >= 5) {
     score += 7;
-    issues.push(`⚠️  Only ${metricsCount} quantifiable metrics - top resumes have 10+`);
+    issues.push(`⚠️  Only ${metricsCount} metrics - Add more numbers! Examples: "Increased sales by 25%", "Reduced load time by 40%", "Managed team of 8", "Processed 10K+ transactions/day"`);
   } else if (metricsCount >= 2) {
     score += 4;
-    issues.push(`❌ Only ${metricsCount} metrics found - add numbers to show impact`);
+    issues.push(`❌ Only ${metricsCount} metrics - Quantify impact! Change "improved performance" → "improved performance by 35%", "large userbase" → "50K+ active users", "fast processing" → "<200ms response time"`);
   } else {
-    issues.push('❌ CRITICAL: No quantifiable achievements - resume appears generic');
+    issues.push('❌ CRITICAL: NO NUMBERS = Generic resume → Add metrics to EVERY bullet: "Built API" → "Built API serving 100K+ requests/day", "Fixed bugs" → "Resolved 50+ critical bugs improving stability by 30%"');
   }
 
   return { score, max: 30, issues };
@@ -189,7 +189,7 @@ function scoreSectionCompleteness(structured: StructuredResume) {
   if (structured.summary && structured.summary.length > 50) {
     score += 5;
   } else {
-    issues.push('Add a professional summary (2-3 sentences)');
+    issues.push('Missing professional summary → Add 2-3 sentences at top: "Software Engineer with 3+ years building scalable web apps. Expert in React, Node.js, AWS. Increased system performance by 40% at PreviousCompany."');
   }
 
   // Experience section (10 pts)

@@ -24,30 +24,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // TEMPORARILY DISABLED FOR TESTING - Unlimited analyses
     // 3. Check user credits (free users get 1 free analysis)
-    if ((user.creditsRemaining ?? 0) <= 0 && user.subscriptionTier === 'free') {
-      return NextResponse.json(
-        {
-          error: 'No credits remaining. Upgrade to Pro for unlimited analyses.',
-          code: 'NO_CREDITS',
-        },
-        { status: 403 }
-      );
-    }
+    // if ((user.creditsRemaining ?? 0) <= 0 && user.subscriptionTier === 'free') {
+    //   return NextResponse.json(
+    //     {
+    //       error: 'No credits remaining. Upgrade to Pro for unlimited analyses.',
+    //       code: 'NO_CREDITS',
+    //     },
+    //     { status: 403 }
+    //   );
+    // }
 
     // 4. Run AI analysis
     console.log(`Analyzing resume ${resumeId} for user ${user.id}`);
     const result = await analyzeResume(resumeId, user.id);
 
+    // TEMPORARILY DISABLED FOR TESTING - No credit deduction
     // 5. Deduct credit if free tier
-    if (user.subscriptionTier === 'free') {
-      await db
-        .update(users)
-        .set({
-          creditsRemaining: Math.max(0, (user.creditsRemaining ?? 0) - 1),
-        })
-        .where(eq(users.id, user.id));
-    }
+    // if (user.subscriptionTier === 'free') {
+    //   await db
+    //     .update(users)
+    //     .set({
+    //       creditsRemaining: Math.max(0, (user.creditsRemaining ?? 0) - 1),
+    //     })
+    //     .where(eq(users.id, user.id));
+    // }
 
     // 6. Return analysis results
     return NextResponse.json({
@@ -55,10 +57,7 @@ export async function POST(request: NextRequest) {
       atsScore: result.atsScore,
       grade: result.grade,
       analysis: result.analysis,
-      creditsRemaining:
-        user.subscriptionTier === 'free'
-          ? Math.max(0, (user.creditsRemaining ?? 0) - 1)
-          : 'unlimited',
+      creditsRemaining: 'unlimited', // Testing mode - unlimited credits
     });
   } catch (error: any) {
     console.error('Analyze API error:', error);
