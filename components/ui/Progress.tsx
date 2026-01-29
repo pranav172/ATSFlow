@@ -67,7 +67,7 @@ export function CircularProgress({
       : colors[color];
 
   return (
-    <div className={cn('inline-flex flex-col items-center', className)}>
+    <div className={cn('relative inline-flex items-center justify-center', className)}>
       <svg width={size} height={size} className="transform -rotate-90">
         {/* Background circle */}
         <circle
@@ -89,16 +89,16 @@ export function CircularProgress({
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          className="transition-all duration-300 ease-in-out"
+          className="transition-all duration-500 ease-out"
         />
       </svg>
       {showLabel && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ width: size, height: size }}>
-          <span className="text-3xl font-bold text-text-primary">
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span className="text-4xl font-bold text-text-primary dark:text-slate-100">
             {clampedValue}
           </span>
           {label && (
-            <span className="text-xs text-text-secondary">
+            <span className="text-xs text-text-secondary dark:text-slate-400 mt-1">
               {label}
             </span>
           )}

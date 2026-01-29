@@ -64,6 +64,7 @@ export default async function ResumePage({ params }: ResumePageProps) {
           <AddLinksSection 
             resumeId={resume.id}
             initialLinks={manualLinks}
+            parsedContact={structured?.contact}
           />
 
           {/* Contact Info Card */}

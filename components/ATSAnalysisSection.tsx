@@ -54,12 +54,6 @@ export function ATSAnalysisSection({ resumeId, initialScore, initialAnalysis }: 
     }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-success';
-    if (score >= 60) return 'text-warning';
-    return 'text-danger';
-  };
-
   const getGradeColor = (grade: string) => {
     if (grade === 'Excellent') return 'bg-success';
     if (grade === 'Good') return 'bg-warning';
@@ -125,20 +119,13 @@ export function ATSAnalysisSection({ resumeId, initialScore, initialAnalysis }: 
             <div className="space-y-6">
               {/* Score Display */}
               <div className="flex items-center justify-center py-4">
-                <div className="relative">
-                  <CircularProgress
-                    value={atsScore}
-                    size={180}
-                    strokeWidth={14}
-                    className={getScoreColor(atsScore)}
-                  />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={`text-5xl font-bold ${getScoreColor(atsScore)}`}>
-                      {atsScore}
-                    </span>
-                    <span className="text-sm text-text-muted dark:text-slate-400">/ 100</span>
-                  </div>
-                </div>
+                <CircularProgress
+                  value={atsScore}
+                  size={180}
+                  strokeWidth={14}
+                  showLabel={true}
+                  label="/ 100"
+                />
               </div>
 
               {/* Grade Badge */}
@@ -150,53 +137,88 @@ export function ATSAnalysisSection({ resumeId, initialScore, initialAnalysis }: 
                 </div>
               )}
 
-              {/* Strengths */}
-              {analysis.aiAnalysis?.strengths && analysis.aiAnalysis.strengths.length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-text-primary dark:text-slate-100 mb-3">
-                    ✅ Strengths
+              {/* DETAILED BREAKDOWN - PRIMARY ANALYSIS */}
+              {analysis.breakdown && (
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5">
+                  <h3 className="text-lg font-bold text-text-primary dark:text-slate-100 mb-4">
+                    📊 Detailed Analysis & Issues
                   </h3>
-                  <ul className="space-y-2">
-                    {analysis.aiAnalysis.strengths.map((strength: string, idx: number) => (
-                      <li key={idx} className="text-sm text-text-secondary dark:text-slate-300 flex items-start">
-                        <span className="text-success mr-2">•</span>
-                        {strength}
-                      </li>
+                  <div className="space-y-5">
+                    {Object.entries(analysis.breakdown).map(([category, data]: [string, any]) => (
+                      <div key={category} className="border-b border-slate-200 dark:border-slate-700 last:border-0 pb-4 last:pb-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-semibold text-text-primary dark:text-slate-100 capitalize">
+                            {category.replace(/([A-Z])/g, ' $1').trim()}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-bold ${
+                              (data.score / data.max) >= 0.8 ? 'text-success' :
+                              (data.score / data.max) >= 0.6 ? 'text-warning' : 'text-danger'
+                            }`}>
+                              {data.score}/{data.max}
+                            </span>
+                            <span className="text-xs text-text-muted dark:text-slate-400">
+                              ({Math.round((data.score / data.max) * 100)}%)
+                            </span>
+                          </div>
+                        </div>
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mb-3">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-500 ${
+                              (data.score / data.max) >= 0.8 ? 'bg-success' :
+                              (data.score / data.max) >= 0.6 ? 'bg-warning' : 'bg-danger'
+                            }`}
+                            style={{ width: `${(data.score / data.max) * 100}%` }}
+                          ></div>
+                        </div>
+                        {data.issues && data.issues.length > 0 && (
+                          <ul className="mt-2 space-y-2 bg-white dark:bg-slate-800 p-3 rounded">
+                            {data.issues.map((issue: string, idx: number) => (
+                              <li key={idx} className="text-sm text-text-secondary dark:text-slate-300 flex items-start">
+                                <span className="text-warning mr-2 flex-shrink-0 mt-0.5">⚠</span>
+                                <span>{issue}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
 
-              {/* Improvements */}
+              {/* AI-Generated Improvements (Secondary) */}
               {analysis.aiAnalysis?.improvements && analysis.aiAnalysis.improvements.length > 0 && (
                 <div>
-                  <h3 className="font-semibold text-text-primary dark:text-slate-100 mb-3">
-                    💡 Suggested Improvements
+                  <h3 className="font-semibold text-text-primary dark:text-slate-100 mb-3 flex items-center gap-2">
+                    <span>🤖</span>
+                    <span>AI-Suggested Improvements</span>
+                    <Badge className="bg-primary text-white text-xs">Powered by Groq</Badge>
                   </h3>
                   <div className="space-y-3">
-                    {analysis.aiAnalysis.improvements.slice(0, 5).map((improvement: any, idx: number) => (
-                      <div key={idx} className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+                    {analysis.aiAnalysis.improvements.map((improvement: any, idx: number) => (
+                      <div key={idx} className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border-l-4 border-primary">
                         <div className="flex items-start justify-between mb-2">
-                          <Badge variant="outline" className="text-xs">
+                          <Badge className="text-xs bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
                             {improvement.category}
                           </Badge>
                           <Badge 
-                            className={
+                            className={`text-xs ${
                               improvement.priority === 'high' 
                                 ? 'bg-danger text-white' 
                                 : improvement.priority === 'medium'
                                 ? 'bg-warning text-white'
                                 : 'bg-slate-400 text-white'
-                            }
+                            }`}
                           >
-                            {improvement.priority}
+                            {improvement.priority} priority
                           </Badge>
                         </div>
                         <p className="text-sm font-medium text-text-primary dark:text-slate-100 mb-1">
                           {improvement.issue}
                         </p>
                         <p className="text-sm text-text-secondary dark:text-slate-300">
-                          {improvement.suggestion}
+                          💡 {improvement.suggestion}
                         </p>
                       </div>
                     ))}
@@ -204,69 +226,45 @@ export function ATSAnalysisSection({ resumeId, initialScore, initialAnalysis }: 
                 </div>
               )}
 
-              {/* Keywords */}
+              {/* Strengths (Condensed) */}
+              {analysis.aiAnalysis?.strengths && analysis.aiAnalysis.strengths.length > 0 && (
+                <details className="bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-200 dark:border-green-800">
+                  <summary className="cursor-pointer p-3 font-semibold text-success flex items-center gap-2">
+                    ✅ Your Strengths ({analysis.aiAnalysis.strengths.length})
+                  </summary>
+                  <ul className="px-4 pb-3 space-y-1">
+                    {analysis.aiAnalysis.strengths.map((strength: string, idx: number) => (
+                      <li key={idx} className="text-sm text-text-secondary dark:text-slate-300 flex items-start">
+                        <span className="text-success mr-2">•</span>
+                        {strength}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+
+              {/* Missing Keywords */}
               {analysis.aiAnalysis?.missingKeywords && analysis.aiAnalysis.missingKeywords.length > 0 && (
                 <div>
                   <h3 className="font-semibold text-text-primary dark:text-slate-100 mb-3">
-                    🔑 Missing Keywords
+                    🔑 Recommended Keywords to Add
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {analysis.aiAnalysis.missingKeywords.slice(0, 10).map((keyword: string, idx: number) => (
-                      <Badge key={idx} variant="outline" className="border-warning text-warning">
+                    {analysis.aiAnalysis.missingKeywords.slice(0, 15).map((keyword: string, idx: number) => (
+                      <Badge key={idx} className="border border-warning text-warning bg-yellow-50 dark:bg-yellow-900/20">
                         {keyword}
                       </Badge>
                     ))}
                   </div>
+                  <p className="text-xs text-text-muted dark:text-slate-400 mt-2">
+                    Add these keywords naturally in your experience and skills sections
+                  </p>
                 </div>
               )}
             </div>
           )}
         </CardContent>
       </Card>
-
-      {/* Category Breakdown (if analyzed) */}
-      {analysis?.breakdown && (
-        <Card className="bg-white dark:bg-dark-surface">
-          <CardHeader>
-            <CardTitle>Score Breakdown</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {Object.entries(analysis.breakdown).map(([category, data]: [string, any]) => (
-                <div key={category}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-text-primary dark:text-slate-100 capitalize">
-                      {category.replace(/([A-Z])/g, ' $1').trim()}
-                    </span>
-                    <span className="text-sm font-semibold">
-                      {data.score}/{data.max}
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full ${
-                        (data.score / data.max) >= 0.8 ? 'bg-success' :
-                        (data.score / data.max) >= 0.6 ? 'bg-warning' : 'bg-danger'
-                      }`}
-                      style={{ width: `${(data.score / data.max) * 100}%` }}
-                    ></div>
-                  </div>
-                  {data.issues && data.issues.length > 0 && (
-                    <ul className="mt-2 space-y-1">
-                      {data.issues.map((issue: string, idx: number) => (
-                        <li key={idx} className="text-xs text-text-muted dark:text-slate-400 flex items-start">
-                          <span className="text-warning mr-1">⚠</span>
-                          {issue}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </>
   );
 }
