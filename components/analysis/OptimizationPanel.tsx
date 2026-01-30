@@ -8,9 +8,10 @@ import { Loader2, Wand2, Check, Copy } from 'lucide-react';
 interface OptimizationPanelProps {
   originalText: string;
   type: 'bullet' | 'summary' | 'skill';
+  resumeContext?: string;
 }
 
-export function OptimizationPanel({ originalText, type }: OptimizationPanelProps) {
+export function OptimizationPanel({ originalText, type, resumeContext }: OptimizationPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [optimizedText, setOptimizedText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,7 +26,12 @@ export function OptimizationPanel({ originalText, type }: OptimizationPanelProps
     if (type === 'bullet') instruction = "Rewrite this bullet point to use strong action verbs, include metrics if implied, and be concise.";
     if (type === 'summary') instruction = "Rewrite this professional summary to be punchy, keyword-rich, and executive-level.";
     
-    const res = await optimizeSection(originalText, instruction);
+    // If it's a missing section advice (starts with ! or contains 'Add a'), tweak instruction
+    if (originalText.includes("Add a") || originalText.includes("Missing")) {
+        instruction = "Generate this missing resume section based on the resume context.";
+    }
+    
+    const res = await optimizeSection(originalText, instruction, resumeContext);
     if (res.success && res.text) {
       setOptimizedText(res.text);
     } else {

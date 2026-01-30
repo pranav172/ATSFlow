@@ -128,7 +128,7 @@ export function AnalysisResult({ analysis, resumeText }: AnalysisResultProps) {
                           <span className="text-red-500 mt-0.5 shrink-0">!</span> 
                           <span>{formatText(item)}</span>
                        </div>
-                       <OptimizationPanel originalText={item} type="bullet" />
+                       <OptimizationPanel originalText={item} type="bullet" resumeContext={resumeText} />
                      </div>
                   ))}
                </div>

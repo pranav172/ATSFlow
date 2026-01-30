@@ -34,9 +34,9 @@ export class HybridAIService {
     }
   }
 
-  async optimizeText(text: string, instruction: string, provider: AIProvider = 'groq'): Promise<string> {
+  async optimizeText(text: string, instruction: string, provider: AIProvider = 'groq', context?: string): Promise<string> {
     if (provider === 'groq' && process.env.GROQ_API_KEY) {
-        return this.optimizeWithGroq(text, instruction);
+        return this.optimizeWithGroq(text, instruction, context);
     }
     return this.optimizeWithGemini(text, instruction);
   }
@@ -80,23 +80,31 @@ export class HybridAIService {
     }
   }
 
-  private async optimizeWithGroq(text: string, instruction: string): Promise<string> {
+  private async optimizeWithGroq(text: string, instruction: string, context?: string): Promise<string> {
       try {
           const client = getGroqClient();
           if (!client) throw new Error("Groq API Key missing");
 
+          let systemPrompt = "You are an expert Resume Editor. Your ONLY task is to rewrite the input text to be more punchy, concise, and impact-driven. \n\nRULES:\n1. Return ONLY the rewritten text.\n2. Do NOT provide explanations, advice, or conversational filler.\n3. Use strong action verbs.\n4. If the input is a bullet point, keep it as a bullet point.";
+          let userContent = `Instruction: ${instruction}\n\nOriginal Text: "${text}"\n\nRewritten Version:`;
+
+          // If we have context (resume text) and the original text is likely a "missing section" instruction (short), switch to GENERATION mode.
+          if (context && text.length < 200) {
+             systemPrompt = "You are an expert Resume Writer. Your task is to GENERATE a new resume section based on the instruction and the candidate's background. \n\nRULES:\n1. Write ONLY the requested section content.\n2. Do NOT include 'Here is the summary'.\n3. Use professional, executive-level language.\n4. Base the content strictly on the provided Resume Context.";
+             userContent = `Instruction: ${instruction}\n\nResume Context: """${context.slice(0, 8000)}"""\n\nGenerated Content:`;
+          }
+
           const completion = await client.chat.completions.create({
               messages: [
-                  { role: "system", content: "You are an expert Resume Editor. Your ONLY task is to rewrite the input text to be more punchy, concise, and impact-driven. \n\nRULES:\n1. Return ONLY the rewritten text.\n2. Do NOT provide explanations, advice, or conversational filler (e.g., 'Here is the rewritten text').\n3. Use strong action verbs.\n4. If the input is a bullet point, keep it as a bullet point." },
-                  { role: "user", content: `Instruction: ${instruction}\n\nOriginal Text: "${text}"\n\nRewritten Version:` }
+                  { role: "system", content: systemPrompt },
+                  { role: "user", content: userContent }
               ],
-              model: "llama-3.3-70b-versatile", // Using latest Llama 3.3 for best performance
+              model: "llama-3.3-70b-versatile", 
               temperature: 0.5,
           });
           return completion.choices[0]?.message?.content || "";
       } catch (error) {
           console.error("Groq Optimization Error (falling back to Gemini):", error);
-          // Fallback to Gemini if Groq fails
           return this.optimizeWithGemini(text, instruction);
       }
   }

@@ -15,10 +15,10 @@ async function checkAuth() {
   return userId;
 }
 
-export async function optimizeSection(originalText: string, instruction: string) {
+export async function optimizeSection(originalText: string, instruction: string, context?: string) {
   try {
      // Use Hybrid Service - defaults to Groq if key exists, falls back to Gemini
-     const rewrittenText = await aiService.optimizeText(originalText, instruction, 'groq');
+     const rewrittenText = await aiService.optimizeText(originalText, instruction, 'groq', context);
      return { success: true, text: rewrittenText.trim() };
   } catch (error) {
     console.error("Optimize Error:", error);
