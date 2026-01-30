@@ -24,7 +24,7 @@ export class HybridAIService {
   }
 
   async analyzeResume(resumeText: string): Promise<ResumeAnalysis> {
-    // For deep structured analysis, we prefer Gemini 1.5 due to its strong JSON adherence and large context
+    // For deep structured analysis, we prefer Gemini 2.5 due to its strong JSON adherence and large context
     if (this.provider === 'gemini') {
       return this.analyzeWithGemini(resumeText);
     } else {
@@ -110,7 +110,7 @@ export class HybridAIService {
   }
 
   private async optimizeWithGemini(text: string, instruction: string): Promise<string> {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       const prompt = `Rewrite this text. Instruction: ${instruction}. Original: "${text}". Return ONLY rewritten text.`;
       const result = await model.generateContent(prompt);
       return result.response.text();
