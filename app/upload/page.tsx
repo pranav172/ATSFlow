@@ -6,6 +6,8 @@ import { AnalysisResult } from '@/components/AnalysisResult';
 import { ResumeAnalysis } from '@/lib/ai/schema';
 import { Button } from '@/components/ui/Button';
 
+import { SmartNavbar } from '@/components/SmartNavbar';
+
 export default function UploadPage() {
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -34,28 +36,28 @@ export default function UploadPage() {
     }
   };
 
-  if (isAnalyzing) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-        {/* Simple CSS Spinner */}
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p className="text-lg font-medium animate-pulse text-text-primary dark:text-dark-text-primary">
-            Analyzing your resume with AI...
-        </p>
-        <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
-            This usually takes 10-20 seconds.
-        </p>
-      </div>
-    );
-  }
-
-  if (analysis) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-background p-8">
+  const renderContent = () => {
+    if (isAnalyzing) {
+      return (
+        <div className="flex flex-col items-center justify-center space-y-4 py-20">
+          {/* Simple CSS Spinner */}
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-lg font-medium animate-pulse text-text-primary dark:text-dark-text-primary">
+              Analyzing your resume with AI...
+          </p>
+          <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
+              This usually takes 10-20 seconds.
+          </p>
+        </div>
+      );
+    }
+  
+    if (analysis) {
+      return (
         <div className="max-w-7xl mx-auto space-y-8">
             <div className="flex justify-between items-center">
                  <div className="flex items-center gap-4">
-                    <h1 className="text-3xl font-bold">Analysis Results</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analysis Results</h1>
                  </div>
                  <div className="flex items-center gap-2">
                     <Button onClick={() => setAnalysis(null)} variant="secondary">Upload Another</Button>
@@ -63,24 +65,33 @@ export default function UploadPage() {
             </div>
             <AnalysisResult analysis={analysis} resumeText="" />
         </div>
+      );
+    }
+  
+    return (
+      <div className="flex flex-col items-center justify-center p-4 min-h-[80vh]">
+        <div className="w-full max-w-4xl text-center space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold text-text-primary dark:text-dark-text-primary">
+              Upload Your Resume
+            </h1>
+            <p className="text-text-secondary dark:text-dark-text-secondary text-lg max-w-2xl mx-auto">
+              Our AI will analyze your resume against ATS standards and help you optimize it for your dream job.
+            </p>
+          </div>
+  
+          <FileUpload onUploadComplete={handleUploadComplete} />
+        </div>
       </div>
     );
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-background flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-4xl text-center space-y-8">
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-text-primary dark:text-dark-text-primary">
-            Upload Your Resume
-          </h1>
-          <p className="text-text-secondary dark:text-dark-text-secondary text-lg max-w-2xl mx-auto">
-            Our AI will analyze your resume against ATS standards and help you optimize it for your dream job.
-          </p>
-        </div>
-
-        <FileUpload onUploadComplete={handleUploadComplete} />
-      </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-background">
+      <SmartNavbar />
+      <main className="pt-20 px-4 pb-12">
+        {renderContent()}
+      </main>
     </div>
   );
 }
