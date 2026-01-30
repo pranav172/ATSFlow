@@ -1,5 +1,5 @@
 import { ClerkProvider } from '@clerk/nextjs';
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from '@/components/ui/Toast';
@@ -17,19 +17,20 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500", "600"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#8b5cf6",
+};
+
 export const metadata: Metadata = {
   title: "ATSFlow | Beat the Bots. Land the Job.",
   description: "AI-powered resume optimization that gets past applicant tracking systems and in front of hiring managers.",
   keywords: ["ATS", "resume optimization", "AI resume", "job application", "career tools"],
   authors: [{ name: "ATSFlow" }],
   manifest: "/manifest.json",
-  themeColor: "#8b5cf6",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

@@ -8,6 +8,12 @@ const isProtectedRoute = createRouteMatcher([
   '/api/optimize(.*)',
 ]);
 
+// Actually, createRouteMatcher defines what IS protected.
+// So if I don't add /debug, it is public?
+// Default clerkMiddleware protects all routes unless specified?
+// No, the code says `if (isProtectedRoute(req)) await auth.protect()`.
+// So /debug should be public by default.
+
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
     await auth.protect();

@@ -70,10 +70,10 @@ function ToastContainer({
 
 function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   const variants = {
-    default: 'bg-white border-border',
-    success: 'bg-emerald-50 border-emerald-200',
-    warning: 'bg-amber-50 border-amber-200',
-    danger: 'bg-red-50 border-red-200',
+    default: 'bg-white dark:bg-dark-surface border-border dark:border-dark-border',
+    success: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200',
+    warning: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200',
+    danger: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
   };
 
   const icons = {
@@ -92,14 +92,14 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
     >
       <span className="text-xl">{icons[toast.variant || 'default']}</span>
       <div className="flex-1">
-        <h4 className="font-semibold text-text-primary">{toast.title}</h4>
+        <h4 className="font-semibold text-text-primary dark:text-dark-text-primary">{toast.title}</h4>
         {toast.description && (
-          <p className="text-sm text-text-secondary mt-1">{toast.description}</p>
+          <p className="text-sm text-text-secondary dark:text-dark-text-secondary mt-1">{toast.description}</p>
         )}
       </div>
       <button
         onClick={onClose}
-        className="text-text-muted hover:text-text-primary transition-colors"
+        className="text-text-muted dark:text-dark-text-muted hover:text-text-primary dark:hover:text-dark-text-primary transition-colors"
       >
         ✕
       </button>

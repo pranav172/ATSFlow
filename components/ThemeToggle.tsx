@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Avoid hydration mismatch
@@ -21,18 +21,20 @@ export function ThemeToggle() {
     );
   }
 
+  const isDark = resolvedTheme === 'dark';
+
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className="relative w-14 h-7 bg-slate-300 dark:bg-slate-700 rounded-full p-1 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
       aria-label="Toggle theme"
     >
       <div
         className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center ${
-          theme === 'dark' ? 'translate-x-7' : 'translate-x-0'
+          isDark ? 'translate-x-7' : 'translate-x-0'
         }`}
       >
-        {theme === 'dark' ? (
+        {isDark ? (
           // Moon icon
           <svg
             className="w-3 h-3 text-slate-700"

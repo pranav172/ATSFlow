@@ -21,8 +21,8 @@ export function Button({
   
   const variants = {
     primary: 'bg-primary text-white hover:bg-primary-hover hover:shadow-xl hover:scale-105 shadow-lg',
-    secondary: 'bg-white text-primary border-2 border-primary hover:bg-primary-light',
-    ghost: 'bg-transparent text-text-secondary hover:bg-surface hover:text-text-primary',
+    secondary: 'bg-white dark:bg-dark-surface text-text-primary dark:text-dark-text-primary border-2 border-primary hover:bg-primary-light dark:hover:bg-dark-surfaceHover',
+    ghost: 'bg-transparent text-text-secondary dark:text-dark-text-secondary hover:bg-surface dark:hover:bg-dark-surface hover:text-text-primary dark:hover:text-dark-text-primary',
     danger: 'bg-danger text-white hover:bg-red-600 hover:shadow-lg',
   };
   

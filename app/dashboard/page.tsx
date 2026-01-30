@@ -1,151 +1,53 @@
-import { getOrCreateUser } from '@/lib/services/user-sync';
-import { db } from '@/lib/db';
-import { resumes } from '@/lib/db/schema';
-import { eq, desc } from 'drizzle-orm';
-import Header from '@/components/Header';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
+import { getResumes } from '@/lib/actions/resume-actions';
+import { ResumeCard } from '@/components/dashboard/ResumeCard';
+import { Button } from '@/components/ui/Button';
+import { Plus, UploadCloud } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { auth } from '@clerk/nextjs/server';
 
 export default async function DashboardPage() {
-  const user = await getOrCreateUser();
-  if (!user) {
-    redirect('/sign-in');
-  }
+  const { userId } = await auth();
+  if (!userId) redirect('/');
 
-  // Fetch user's resumes
-  const userResumes = await db
-    .select()
-    .from(resumes)
-    .where(eq(resumes.userId, user.id))
-    .orderBy(desc(resumes.createdAt))
-    .limit(5);
-
-  // Calculate stats
-  const totalResumes = userResumes.length;
-  const averageScore = totalResumes > 0
-    ? Math.round(userResumes.reduce((sum, r) => sum + (r.atsScore || 0), 0) / totalResumes)
-    : 0;
-  const recentAnalysis = userResumes[0]?.createdAt
-    ? new Date(userResumes[0].createdAt).toLocaleDateString()
-    : 'None';
+  const resumes = await getResumes();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light via-white to-violet-50 dark:from-dark-background dark:via-dark-surface dark:to-purple-950/20 transition-colors duration-300">
-      <Header />
-      
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="space-y-8">
-          {/* Welcome Header */}
-          <div className="text-center sm:text-left">
-            <h1 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-slate-100 mb-2">
-              Welcome back! 👋
-            </h1>
-            <p className="text-base sm:text-lg text-text-secondary dark:text-slate-300">
-              Here's your resume optimization dashboard
-            </p>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <Card className="bg-white dark:bg-dark-surface">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-text-secondary dark:text-slate-400">Total Resumes</p>
-                    <p className="text-3xl sm:text-4xl font-bold text-primary mt-2">{totalResumes}</p>
-                  </div>
-                  <div className="text-4xl">📄</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white dark:bg-dark-surface">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-text-secondary dark:text-slate-400">Average Score</p>
-                    <p className="text-3xl sm:text-4xl font-bold text-success mt-2">{averageScore}/100</p>
-                  </div>
-                  <div className="text-4xl">📊</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white dark:bg-dark-surface">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-text-secondary dark:text-slate-400">Recent Analysis</p>
-                    <p className="text-base sm:text-lg font-semibold text-text-primary dark:text-slate-100 mt-2">
-                      {recentAnalysis}
-                    </p>
-                  </div>
-                  <div className="text-4xl">⚡</div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Recent Resumes */}
-          <Card className="bg-white dark:bg-dark-surface">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <CardTitle>Recent Resumes</CardTitle>
-                <Link href="/upload">
-                  <button className="btn-primary w-full sm:w-auto">
-                    Upload New Resume ⚡
-                  </button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {userResumes.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-text-secondary dark:text-slate-400 mb-4">
-                    No resumes analyzed yet
-                  </p>
-                  <Link href="/upload">
-                    <button className="btn-secondary">
-                      Upload Your First Resume
-                    </button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {userResumes.map((resume) => (
-                    <Link
-                      key={resume.id}
-                      href={`/resumes/${resume.id}`}
-                      className="block"
-                    >
-                      <div className="p-4 rounded-lg border border-border dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-text-primary dark:text-slate-100 truncate">
-                              {resume.originalFilename}
-                            </p>
-                            <p className="text-sm text-text-secondary dark:text-slate-400">
-                              Analyzed {new Date(resume.createdAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <Badge variant={resume.atsScore && resume.atsScore >= 80 ? 'success' : resume.atsScore && resume.atsScore >= 60 ? 'warning' : 'danger'}>
-                              {resume.atsScore || 0}/100
-                            </Badge>
-                            <span className="text-primary dark:text-primary-light">→</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+           <h1 className="text-3xl font-bold text-text-primary dark:text-dark-text-primary">My Resumes</h1>
+           <p className="text-text-secondary dark:text-dark-text-secondary mt-1">
+             Manage and optimize your resumes for different job applications.
+           </p>
         </div>
-      </main>
+        <Link href="/upload">
+           <Button className="shadow-lg shadow-primary/20">
+             <Plus className="w-4 h-4 mr-2" /> New Upload
+           </Button>
+        </Link>
+      </div>
+
+      {resumes.length === 0 ? (
+        <div className="flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-border dark:border-dark-border rounded-xl bg-gray-50/50 dark:bg-dark-surface/50 text-center p-8">
+           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+              <UploadCloud className="w-8 h-8 text-primary" />
+           </div>
+           <h3 className="text-xl font-semibold mb-2">No resumes uploaded yet</h3>
+           <p className="text-muted-foreground max-w-sm mb-6">
+             Upload your first resume to get an instant ATS analysis and improvement suggestions.
+           </p>
+           <Link href="/upload">
+             <Button size="lg">Upload Resume</Button>
+           </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+           {resumes.map((resume) => (
+             <ResumeCard key={resume.id} resume={resume} />
+           ))}
+        </div>
+      )}
     </div>
   );
 }

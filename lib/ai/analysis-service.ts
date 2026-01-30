@@ -1,0 +1,107 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
+import { ResumeAnalysisSchema, ResumeAnalysis } from './schema';
+
+// Initialize Clients
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
+
+type AIProvider = 'gemini' | 'groq';
+
+export class HybridAIService {
+  private provider: AIProvider;
+
+  constructor(provider: AIProvider = 'gemini') {
+    this.provider = provider;
+  }
+
+  async analyzeResume(resumeText: string): Promise<ResumeAnalysis> {
+    // For deep structured analysis, we prefer Gemini 1.5 due to its strong JSON adherence and large context
+    if (this.provider === 'gemini') {
+      return this.analyzeWithGemini(resumeText);
+    } else {
+        // Fallback or alternative implementation for Groq if needed
+        // Currently keeping Gemini as primary for the main analysis due to complexity
+        return this.analyzeWithGemini(resumeText);
+    }
+  }
+
+  async optimizeText(text: string, instruction: string, provider: AIProvider = 'groq'): Promise<string> {
+    if (provider === 'groq' && process.env.GROQ_API_KEY) {
+        return this.optimizeWithGroq(text, instruction);
+    }
+    return this.optimizeWithGemini(text, instruction);
+  }
+
+  private async analyzeWithGemini(resumeText: string): Promise<ResumeAnalysis> {
+    if (!process.env.GOOGLE_AI_API_KEY) throw new Error('GOOGLE_AI_API_KEY is not set');
+
+    const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash",
+        generationConfig: { responseMimeType: "application/json" }
+    });
+
+    const prompt = `
+        You are an expert ATS (Applicant Tracking System) optimization specialist. 
+        Analyze the following resume text and provide a structured assessment.
+        
+        CRITICAL: Return valid JSON matching this structure:
+        {
+        "score": number (0-100),
+        "summary": string,
+        "strengths": string[],
+        "weaknesses": string[],
+        "hardSkills": string[],
+        "softSkills": string[],
+        "formattingIssues": string[],
+        "missingSections": string[],
+        "improvementSuggestions": string[]
+        }
+
+        Resume Text:
+        """${resumeText}"""
+    `;
+
+    try {
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        return ResumeAnalysisSchema.parse(JSON.parse(text));
+    } catch (error) {
+        console.error("Gemini Analysis Error:", error);
+        throw new Error('AI Analysis Failed');
+    }
+  }
+
+  private async optimizeWithGroq(text: string, instruction: string): Promise<string> {
+      try {
+          const completion = await groq.chat.completions.create({
+              messages: [
+                  { role: "system", content: "You are an expert Resume Editor. Rewrite the text to be punchy, concise, and impact-driven. Return ONLY the rewritten text." },
+                  { role: "user", content: `Instruction: ${instruction}\n\nOriginal: "${text}"` }
+              ],
+              model: "llama3-70b-8192",
+              temperature: 0.5,
+          });
+          return completion.choices[0]?.message?.content || "";
+      } catch (error) {
+          console.error("Groq Optimization Error:", error);
+          // Fallback to Gemini if Groq fails
+          return this.optimizeWithGemini(text, instruction);
+      }
+  }
+
+  private async optimizeWithGemini(text: string, instruction: string): Promise<string> {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const prompt = `Rewrite this text. Instruction: ${instruction}. Original: "${text}". Return ONLY rewritten text.`;
+      const result = await model.generateContent(prompt);
+      return result.response.text();
+  }
+}
+
+// Singleton or Helper Export
+export const aiService = new HybridAIService();
+
+// Legacy Wrapper for Analysis API
+export async function analyzeResume(resumeText: string): Promise<ResumeAnalysis> {
+    return aiService.analyzeResume(resumeText);
+}

@@ -12,14 +12,14 @@ export function Progress({ value, className, showLabel = false }: ProgressProps)
 
   return (
     <div className={cn('w-full', className)}>
-      <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
         <div
           className="h-full bg-primary rounded-full transition-all duration-300 ease-in-out"
           style={{ width: `${clampedValue}%` }}
         />
       </div>
       {showLabel && (
-        <p className="text-xs text-text-secondary text-center mt-1">
+        <p className="text-xs text-text-secondary dark:text-dark-text-secondary text-center mt-1">
           {clampedValue}%
         </p>
       )}
@@ -75,8 +75,9 @@ export function CircularProgress({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#e2e8f0"
+          stroke="currentColor"
           strokeWidth={strokeWidth}
+          className="text-border dark:text-dark-border"
         />
         {/* Progress circle */}
         <circle
@@ -94,11 +95,11 @@ export function CircularProgress({
       </svg>
       {showLabel && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-4xl font-bold text-text-primary dark:text-slate-100">
+          <span className="text-4xl font-bold text-text-primary dark:text-dark-text-primary">
             {clampedValue}
           </span>
           {label && (
-            <span className="text-xs text-text-secondary dark:text-slate-400 mt-1">
+            <span className="text-xs text-text-secondary dark:text-dark-text-secondary mt-1">
               {label}
             </span>
           )}

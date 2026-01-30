@@ -1,112 +1,84 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrCreateUser } from '@/lib/services/user-sync';
-import { analyzeResume } from '@/lib/services/analyze-resume';
+import { auth } from '@clerk/nextjs/server';
+import { db } from '@/lib/db';
+import { resumes, users } from '@/lib/db/schema';
+import { eq, and } from 'drizzle-orm';
+import { analyzeResume } from '@/lib/ai/analysis-service';
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    // 1. Authenticate user
-    const user = await getOrCreateUser();
-    if (!user) {
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 2. Parse request body
-    const body = await request.json();
-    const { resumeId } = body;
+    // Resolve Clerk ID to Internal DB ID
+    
+    const dbUser = await db.query.users.findFirst({
+        where: eq(users.clerkId, userId),
+    });
+
+    if (!dbUser) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    
+    const internalUserId = dbUser.id;
+
+    const { resumeId } = await req.json();
 
     if (!resumeId) {
-      return NextResponse.json(
-        { error: 'Missing resumeId', code: 'MISSING_RESUME_ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Resume ID is required' }, { status: 400 });
     }
 
-    // TEMPORARILY DISABLED FOR TESTING - Unlimited analyses
-    // 3. Check user credits (free users get 1 free analysis)
-    // if ((user.creditsRemaining ?? 0) <= 0 && user.subscriptionTier === 'free') {
-    //   return NextResponse.json(
-    //     {
-    //       error: 'No credits remaining. Upgrade to Pro for unlimited analyses.',
-    //       code: 'NO_CREDITS',
-    //     },
-    //     { status: 403 }
-    //   );
-    // }
+    // 1. Fetch Resume
+    const [resume] = await db
+      .select()
+      .from(resumes)
+      .where(and(eq(resumes.id, resumeId), eq(resumes.userId, internalUserId)))
+      .limit(1);
 
-    // 4. Run AI analysis
-    console.log(`Analyzing resume ${resumeId} for user ${user.id}`);
-    const result = await analyzeResume(resumeId, user.id);
-
-    // TEMPORARILY DISABLED FOR TESTING - No credit deduction
-    // 5. Deduct credit if free tier
-    // if (user.subscriptionTier === 'free') {
-    //   await db
-    //     .update(users)
-    //     .set({
-    //       creditsRemaining: Math.max(0, (user.creditsRemaining ?? 0) - 1),
-    //     })
-    //     .where(eq(users.id, user.id));
-    // }
-
-    // 6. Return analysis results
-    return NextResponse.json({
-      success: true,
-      atsScore: result.atsScore,
-      grade: result.grade,
-      analysis: result.analysis,
-      creditsRemaining: 'unlimited', // Testing mode - unlimited credits
-    });
-  } catch (error: any) {
-    console.error('Analyze API error:', error);
-
-    // Handle specific errors
-    if (error.message === 'Resume not found') {
-      return NextResponse.json(
-        { error: 'Resume not found', code: 'NOT_FOUND' },
-        { status: 404 }
-      );
+    if (!resume) {
+      return NextResponse.json({ error: 'Resume not found' }, { status: 404 });
     }
 
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json(
-        { error: 'Not authorized to analyze this resume', code: 'UNAUTHORIZED' },
-        { status: 403 }
-      );
+    if (!resume.rawText) {
+      return NextResponse.json({ error: 'Resume has no text content to analyze' }, { status: 400 });
     }
 
-    if (error.message === 'Resume not parsed yet') {
-      return NextResponse.json(
-        { error: 'Resume must be parsed before analysis', code: 'NOT_PARSED' },
-        { status: 400 }
-      );
+    // 2. Analyze with AI
+    // Update status to 'analyzing'
+    await db.update(resumes)
+      .set({ status: 'analyzing' })
+      .where(eq(resumes.id, resumeId));
+
+    try {
+      const analysisCheck = await analyzeResume(resume.rawText);
+
+      // 3. Save Results
+      await db.update(resumes)
+        .set({
+          atsScore: analysisCheck.score,
+          atsAnalysis: analysisCheck,
+          status: 'analyzed'
+        })
+        .where(eq(resumes.id, resumeId));
+
+      return NextResponse.json(analysisCheck);
+
+    } catch (aiError) {
+      console.error("AI Analysis Failed Detailed:", aiError);
+      const errorMessage = aiError instanceof Error ? aiError.message : 'Unknown AI Error';
+      
+      // Revert status on failure
+      await db.update(resumes)
+        .set({ status: 'failed', errorMessage: `AI Analysis Failed: ${errorMessage}` })
+        .where(eq(resumes.id, resumeId));
+        
+      return NextResponse.json({ error: `AI Analysis Failed: ${errorMessage}` }, { status: 500 });
     }
 
-    // Rate limit errors from AI providers
-    if (error.message.includes('429') || error.message.includes('rate limit')) {
-      return NextResponse.json(
-        {
-          error: 'AI service temporarily unavailable. Please try again in a minute.',
-          code: 'RATE_LIMIT',
-        },
-        { status: 429 }
-      );
-    }
-
-    // Generic AI errors
-    if (error.message.includes('API') || error.message.includes('Gemini') || error.message.includes('Groq')) {
-      return NextResponse.json(
-        {
-          error: 'AI analysis failed. Please try again.',
-          code: 'AI_ERROR',
-        },
-        { status: 500 }
-      );
-    }
-
-    // Unknown error
-    return NextResponse.json(
-      { error: 'Analysis failed. Please try again later.', code: 'UNKNOWN_ERROR' },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error("Analysis API Error:", error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
