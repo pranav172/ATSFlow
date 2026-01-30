@@ -1,3 +1,5 @@
+'use server';
+
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { auth } from '@clerk/nextjs/server';
 import { aiService } from '@/lib/ai/analysis-service';
