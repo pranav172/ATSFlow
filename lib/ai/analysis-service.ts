@@ -79,19 +79,19 @@ export class HybridAIService {
                   { role: "system", content: "You are an expert Resume Editor. Rewrite the text to be punchy, concise, and impact-driven. Return ONLY the rewritten text." },
                   { role: "user", content: `Instruction: ${instruction}\n\nOriginal: "${text}"` }
               ],
-              model: "llama3-70b-8192",
+              model: "llama-3.3-70b-versatile", // Using latest Llama 3.3 for best performance
               temperature: 0.5,
           });
           return completion.choices[0]?.message?.content || "";
       } catch (error) {
-          console.error("Groq Optimization Error:", error);
+          console.error("Groq Optimization Error (falling back to Gemini):", error);
           // Fallback to Gemini if Groq fails
           return this.optimizeWithGemini(text, instruction);
       }
   }
 
   private async optimizeWithGemini(text: string, instruction: string): Promise<string> {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const prompt = `Rewrite this text. Instruction: ${instruction}. Original: "${text}". Return ONLY rewritten text.`;
       const result = await model.generateContent(prompt);
       return result.response.text();
