@@ -4,7 +4,15 @@ import { ResumeAnalysisSchema, ResumeAnalysis } from './schema';
 
 // Initialize Clients
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
+
+// Lazy init for Groq to avoid crash if key is missing
+let groq: Groq | null = null;
+function getGroqClient() {
+    if (!groq && process.env.GROQ_API_KEY) {
+        groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    }
+    return groq;
+}
 
 type AIProvider = 'gemini' | 'groq';
 
@@ -74,7 +82,10 @@ export class HybridAIService {
 
   private async optimizeWithGroq(text: string, instruction: string): Promise<string> {
       try {
-          const completion = await groq.chat.completions.create({
+          const client = getGroqClient();
+          if (!client) throw new Error("Groq API Key missing");
+
+          const completion = await client.chat.completions.create({
               messages: [
                   { role: "system", content: "You are an expert Resume Editor. Rewrite the text to be punchy, concise, and impact-driven. Return ONLY the rewritten text." },
                   { role: "user", content: `Instruction: ${instruction}\n\nOriginal: "${text}"` }
