@@ -87,8 +87,8 @@ export class HybridAIService {
 
           const completion = await client.chat.completions.create({
               messages: [
-                  { role: "system", content: "You are an expert Resume Editor. Rewrite the text to be punchy, concise, and impact-driven. Return ONLY the rewritten text." },
-                  { role: "user", content: `Instruction: ${instruction}\n\nOriginal: "${text}"` }
+                  { role: "system", content: "You are an expert Resume Editor. Your ONLY task is to rewrite the input text to be more punchy, concise, and impact-driven. \n\nRULES:\n1. Return ONLY the rewritten text.\n2. Do NOT provide explanations, advice, or conversational filler (e.g., 'Here is the rewritten text').\n3. Use strong action verbs.\n4. If the input is a bullet point, keep it as a bullet point." },
+                  { role: "user", content: `Instruction: ${instruction}\n\nOriginal Text: "${text}"\n\nRewritten Version:` }
               ],
               model: "llama-3.3-70b-versatile", // Using latest Llama 3.3 for best performance
               temperature: 0.5,

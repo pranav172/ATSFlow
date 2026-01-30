@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ArrowRight, CheckCircle, FileText, Sparkles, TrendingUp, ShieldCheck, Zap } from 'lucide-react';
@@ -103,18 +104,21 @@ export default function Home() {
                    title="Upload Your Resume" 
                    desc="Drag and drop your PDF resume. We parse it securely using advanced text extraction algorithms."
                    align="left"
+                   imageSrc="/images/step1-upload.png"
                 />
                 <Step 
                    number="02" 
                    title="Paste the Job Description" 
                    desc="Tell us what role you're applying for. We compare your experience directly against the JD."
                    align="right"
+                   imageSrc="/images/step2-analysis.png"
                 />
                 <Step 
                    number="03" 
                    title="Optimize & Apply" 
                    desc="Use our AI suggestions to fill gaps and improve phrasing. Download and apply with confidence."
                    align="left"
+                   imageSrc="/images/step3-optimize.png"
                 />
              </div>
           </div>
@@ -171,7 +175,7 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
    )
 }
 
-function Step({ number, title, desc, align }: { number: string, title: string, desc: string, align: 'left' | 'right' }) {
+function Step({ number, title, desc, align, imageSrc }: { number: string, title: string, desc: string, align: 'left' | 'right', imageSrc: string }) {
    return (
       <div className={`flex flex-col md:flex-row items-center gap-8 md:gap-16 ${align === 'right' ? 'md:flex-row-reverse' : ''}`}>
          <div className="flex-1 text-center md:text-left">
@@ -182,8 +186,13 @@ function Step({ number, title, desc, align }: { number: string, title: string, d
             </p>
          </div>
          <div className="flex-1 w-full max-w-md aspect-video bg-gray-100 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-inner flex items-center justify-center relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5" />
-            <div className="text-gray-400 dark:text-gray-600 font-medium">UI Preview Placeholder</div>
+            <Image 
+                src={imageSrc} 
+                alt={title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+            />
          </div>
       </div>
    )
