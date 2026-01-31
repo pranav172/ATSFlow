@@ -5,7 +5,6 @@ import { ResumeAnalysis } from '@/lib/ai/schema';
 import { Card, CardContent } from '@/components/ui/Card';
 import { CircularProgress } from '@/components/ui/Progress';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
 import { JobTailorModal } from './analysis/JobTailorModal';
 import { OptimizationPanel } from './analysis/OptimizationPanel';
 import { Briefcase, AlertTriangle, Lightbulb, Check, ChevronDown, ChevronUp } from 'lucide-react';
