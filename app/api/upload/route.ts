@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { resumes } from '@/lib/db/schema';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 import pdf from 'pdf-parse';
 import { checkRateLimit, RATE_LIMITS, getRateLimitHeaders } from '@/lib/rate-limit';
 import { ensureUserExists } from '@/lib/actions/user-sync';
@@ -64,25 +62,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to parse PDF content.' }, { status: 500 });
     }
 
-    // Save file locally (for now)
-    // Ensure directory exists
-    const uploadDir = join(process.cwd(), 'public', 'uploads', userId);
-    await mkdir(uploadDir, { recursive: true });
-    
-    // Create a unique filename to avoid collisions
+    // Generate a storage key (for reference, not actual file storage)
+    // On Vercel, we can't write files - store text directly in DB
     const timestamp = Date.now();
     const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filename = `${timestamp}-${sanitizedFilename}`;
-    const filepath = join(uploadDir, filename);
-    const storageKey = `/uploads/${userId}/${filename}`;
+    const storageKey = `db://${userId}/${timestamp}-${sanitizedFilename}`;
 
-    await writeFile(filepath, buffer);
-
-    // Save to Database
-    console.log('Inserting into database:', { userId: internalUserId, filename, mimeType: file.type });
+    // Save to Database (text content stored directly)
+    console.log('Inserting into database:', { userId: internalUserId, filename: file.name });
     try {
       const [resume] = await db.insert(resumes).values({
-        userId: internalUserId, // Use the UUID, not Clerk ID
+        userId: internalUserId,
         originalFilename: file.name,
         storageKey: storageKey,
         fileSizeBytes: file.size,
