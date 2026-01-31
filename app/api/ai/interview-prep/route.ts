@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const rateLimit = checkRateLimit(userId, RATE_LIMITS.aiOperations);
+    const rateLimit = checkRateLimit(userId, RATE_LIMITS.ai);
     if (!rateLimit.success) {
       return NextResponse.json(
         { error: `Rate limit exceeded. Try again in ${rateLimit.resetIn} seconds.` },
