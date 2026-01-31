@@ -1,21 +1,27 @@
 import { getResume } from '@/lib/actions/resume-actions';
 import { AnalysisResult } from '@/components/AnalysisResult';
+import { JDMatcher } from '@/components/JDMatcher';
+import { ExportReportButton } from '@/components/ExportReportButton';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { redirect, notFound } from 'next/navigation';
 import { auth } from '@clerk/nextjs/server';
 
-export default async function ResumeDetailPage({ params }: { params: { id: string } }) {
+export default async function ResumeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth();
   if (!userId) redirect('/');
 
+  const { id } = await params;
+
   try {
-    const resume = await getResume(params.id);
+    const resume = await getResume(id);
 
     if (!resume) {
       notFound();
     }
+
+    const analysisData = resume.atsAnalysis as any;
 
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -38,7 +44,14 @@ export default async function ResumeDetailPage({ params }: { params: { id: strin
            </div>
            
            <div className="flex gap-2">
-             {/* Future: Add 'Download Report' or 'Re-Analyze' buttons here */}
+              {resume.status === 'analyzed' && analysisData && (
+                <ExportReportButton
+                  resumeFilename={resume.originalFilename}
+                  atsScore={resume.atsScore || analysisData.score || 0}
+                  grade={analysisData.grade || 'N/A'}
+                  analysis={analysisData}
+                />
+              )}
               <Link href="/upload">
                 <Button variant="outline">Analyze Another</Button>
               </Link>
@@ -46,7 +59,17 @@ export default async function ResumeDetailPage({ params }: { params: { id: strin
         </div>
 
         {resume.status === 'analyzed' && resume.atsAnalysis ? (
-           <AnalysisResult analysis={resume.atsAnalysis as any} resumeText={resume.rawText || ''} /> 
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Analysis - Takes 2 columns on large screens */}
+            <div className="lg:col-span-2">
+              <AnalysisResult analysis={resume.atsAnalysis as any} resumeText={resume.rawText || ''} />
+            </div>
+            
+            {/* JD Matcher - Side panel on large screens */}
+            <div className="lg:col-span-1">
+              <JDMatcher resumeId={resume.id} />
+            </div>
+          </div>
         ) : (
            <div className="p-12 text-center border rounded-lg bg-surface/50 dark:bg-dark-surface/50">
               <h3 className="text-xl font-semibold mb-2">Analysis Pending or Failed</h3>
@@ -70,3 +93,4 @@ export default async function ResumeDetailPage({ params }: { params: { id: strin
     notFound(); 
   }
 }
+

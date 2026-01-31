@@ -15,6 +15,7 @@ export function MobileMenu() {
     { href: '/', label: 'Home' },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/upload', label: 'Upload Resume' },
+    { href: '/latex', label: 'LaTeX Optimizer' },
     { href: '/pricing', label: 'Pricing' },
   ];
 

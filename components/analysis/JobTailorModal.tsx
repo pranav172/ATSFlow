@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/Dialog'; // We might need to create this wrapper or use raw Radix/UI
+
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
 import { tailorResumeToJob } from '@/lib/actions/optimize-actions';
 import { Loader2, Briefcase, Check, Copy } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/Card';
+
 
 // Quick Mock for Dialog if not exists, but let's assume standard UI pattern or we'll build it.
 // Actually, standard Shadcn Dialog is complex to implement from scratch in one file if not already there.
@@ -22,7 +22,13 @@ export function JobTailorModal({ resumeText }: { resumeText: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [jd, setJd] = useState('');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ tailoredSummary: string; missingKeywords: string[] } | null>(null);
+  const [result, setResult] = useState<{ 
+    tailoredSummary: string; 
+    missingKeywords: string[]; 
+    matchScore: number; 
+    skillGaps: string[]; 
+    suggestedRewrites: { original: string; rewritten: string }[] 
+  } | null>(null);
 
   const handleAnalyze = async () => {
     if (!jd.trim()) return;

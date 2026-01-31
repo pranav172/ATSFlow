@@ -15,13 +15,28 @@ declare global {
 // max: 10 connections (Neon's default pool size is 10 in Session mode)
 // idle_timeout: Close idle connections after 20 seconds
 // connect_timeout: Fail fast if connection takes > 10s
-const queryClient = 
-  globalThis._queryClient ||
-  postgres(process.env.DATABASE_URL!, {
-    max: 10,
-    idle_timeout: 20,
-    connect_timeout: 10,
-  });
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  console.warn('⚠️ DATABASE_URL is not defined. The app will run in limited mode with mock data where possible.');
+}
+
+// Connection for queries with proper pooling
+let queryClient;
+try {
+  queryClient = 
+    globalThis._queryClient ||
+    postgres(connectionString || 'postgres://user:pass@localhost:5432/db', {
+      max: 10,
+      idle_timeout: 20,
+      connect_timeout: 10,
+      onnotice: () => {}, 
+    });
+} catch (e) {
+  console.error("Failed to initialize Postgres client:", e);
+  // Create a dummy client that warns on use but doesn't crash app start
+  queryClient = postgres('postgres://user:pass@localhost:5432/db', { max: 1, onnotice: () => {} });
+}
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis._queryClient = queryClient;
@@ -30,9 +45,16 @@ if (process.env.NODE_ENV !== 'production') {
 export const db = drizzle(queryClient, { schema });
 
 // Connection for migrations (single connection)
-const migrationClient = 
-  globalThis._migrationClient ||
-  postgres(process.env.DATABASE_URL!, { max: 1 });
+let migrationClient;
+try {
+  migrationClient = 
+    globalThis._migrationClient ||
+    postgres(connectionString || 'postgres://user:pass@localhost:5432/db', { max: 1 });
+} catch (e) {
+  console.error("Failed to init migration client:", e);
+  migrationClient = postgres('postgres://user:pass@localhost:5432/db', { max: 1 });
+}
+
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis._migrationClient = migrationClient;

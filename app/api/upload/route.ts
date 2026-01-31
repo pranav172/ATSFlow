@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
-import { resumes, users } from '@/lib/db/schema'; // Added users
-import { eq } from 'drizzle-orm'; // Added eq
+import { resumes } from '@/lib/db/schema';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import pdf from 'pdf-parse';
+import { checkRateLimit, RATE_LIMITS, getRateLimitHeaders } from '@/lib/rate-limit';
+import { ensureUserExists } from '@/lib/actions/user-sync';
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,29 +16,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Resolve Clerk ID to Internal DB ID
-    let dbUser = await db.query.users.findFirst({
-      where: eq(users.clerkId, userId),
-    });
+    // Rate limiting check
+    const rateLimit = checkRateLimit(userId, RATE_LIMITS.upload);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: `Rate limit exceeded. Try again in ${rateLimit.resetIn} seconds.` },
+        { status: 429, headers: getRateLimitHeaders(rateLimit) }
+      );
+    }
 
-    // If user doesn't exist in local DB (webhook missed?), create them
+    // Ensure user exists in local DB (handles webhook sync issues)
+    const dbUser = await ensureUserExists(userId);
+    
     if (!dbUser) {
-        console.log('User not found in local DB, creating on-the-fly:', userId);
-        const [newUser] = await db.insert(users).values({
-            clerkId: userId,
-            email: 'placeholder@example.com', // We might not have email here if not in session, but let's try to proceed or handle carefully.
-            // Actually, we can't get email easily without Clerk SDK call here if not passed.
-            // But usually webhooks handle this. For now, let's assume webhooks worked OR minimal insert.
-            // Wait, email is unique and notNull. We can't insert without it.
-            // Let's assume for now we must query.
-            // If strictly missing, we might fail or need to fetch from Clerk.
-        }).returning();
-        // dbUser = newUser; 
-        
-        // Failsafe: If we can't create (validation), we must return error.
-        return NextResponse.json({ 
-            error: 'User account not synchronized. Please try logging out and back in.' 
-        }, { status: 404 });
+      return NextResponse.json({ 
+        error: 'Could not sync user account. Please try logging out and back in.' 
+      }, { status: 500 });
     }
 
     const internalUserId = dbUser.id;

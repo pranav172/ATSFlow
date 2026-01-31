@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Card, CardContent } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+
 import { Progress } from '@/components/ui/Progress';
 import { useToast } from '@/components/ui/Toast';
 import { cn } from '@/lib/utils';

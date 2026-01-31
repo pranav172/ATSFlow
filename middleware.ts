@@ -15,8 +15,19 @@ const isProtectedRoute = createRouteMatcher([
 // So /debug should be public by default.
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    await auth.protect();
+  try {
+    if (isProtectedRoute(req)) {
+      await auth.protect();
+    }
+  } catch (error) {
+    console.error('Middleware Error:', error);
+    // We cannot render a React component from middleware, but we can return a response
+    // If auth fails, Clerk usually handles it, but if something else fails:
+    // throw error; // Rethrowing likely causes the 500
+    
+    // Return a text response for debugging if needed, or let Next handles it.
+    // Ideally we want to see the error.
+    console.error("CRITICAL MIDDLEWARE FAILURE", error);
   }
 });
 

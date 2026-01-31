@@ -2,13 +2,14 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'pro';
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'pro' | 'secondary';
   children: React.ReactNode;
 }
 
 export function Badge({ variant = 'default', className, children, ...props }: BadgeProps) {
   const variants = {
     default: 'bg-surface dark:bg-dark-surface text-text-primary dark:text-dark-text-primary border border-border dark:border-dark-border',
+    secondary: 'bg-gray-100 text-gray-800 border border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
     success: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
     warning: 'bg-amber-100 text-amber-700 border border-amber-200',
     danger: 'bg-red-100 text-red-700 border border-red-200',
