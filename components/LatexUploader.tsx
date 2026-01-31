@@ -283,7 +283,7 @@ export function LatexUploader() {
                       <Badge className={getPriorityColor(suggestion.priority)}>
                         {suggestion.priority}
                       </Badge>
-                      <Badge variant="outline" className="capitalize">
+                      <Badge variant="secondary" className="capitalize">
                         {suggestion.type}
                       </Badge>
                     </div>
