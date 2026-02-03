@@ -68,10 +68,10 @@ export default function Home() {
           <div className="container mx-auto px-4 max-w-6xl">
              <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">Everything you need to get hired</h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400">Our suite of tools ensures your application stands out.</p>
+                <p className="text-lg text-gray-600 dark:text-gray-400">Our suite of AI-powered tools ensures your application stands out.</p>
              </div>
              
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <FeatureCard 
                    icon={<FileText className="w-8 h-8 text-blue-500" />}
                    title="ATS Compliance Score"
@@ -86,6 +86,21 @@ export default function Home() {
                    icon={<Zap className="w-8 h-8 text-purple-500" />}
                    title="AI Content Tailoring"
                    description="Don't just see the errors—fix them. Our AI rewrites your bullet points to be punchy, impactful, and perfectly aligned."
+                />
+                <FeatureCard 
+                   icon={<Sparkles className="w-8 h-8 text-amber-500" />}
+                   title="Interview Prep AI"
+                   description="Generate tailored interview questions based on your resume and job description. Get tips and sample answers to practice."
+                />
+                <FeatureCard 
+                   icon={<FileText className="w-8 h-8 text-emerald-500" />}
+                   title="Cover Letter Generator"
+                   description="Create personalized cover letters in seconds. Our AI crafts compelling letters that highlight your relevant experience."
+                />
+                <FeatureCard 
+                   icon={<ArrowRight className="w-8 h-8 text-indigo-500" />}
+                   title="Export to PDF/DOCX"
+                   description="Download your optimized resume in multiple formats. Ready to submit to any job application portal."
                 />
              </div>
           </div>

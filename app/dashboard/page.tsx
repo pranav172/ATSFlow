@@ -2,7 +2,7 @@ import { getResumes } from '@/lib/actions/resume-actions';
 import { ResumeCard } from '@/components/dashboard/ResumeCard';
 import { AIInsightCard } from '@/components/AIInsightCard';
 import { Button } from '@/components/ui/Button';
-import { Upload, FileCode, History, Plus, Sparkles } from 'lucide-react';
+import { Upload, FileCode, History, Plus, Sparkles, MessageCircle, FileText, Download } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs/server';
@@ -80,6 +80,36 @@ export default async function DashboardPage() {
             </div>
             <h3 className="font-semibold">AI Tools</h3>
             <p className="text-amber-100 text-sm">Quick polish</p>
+          </div>
+        </Link>
+
+        <Link href="/interview-prep" className="group">
+          <div className="p-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <MessageCircle className="w-6 h-6" />
+            </div>
+            <h3 className="font-semibold">Interview Prep</h3>
+            <p className="text-blue-100 text-sm">Practice questions</p>
+          </div>
+        </Link>
+
+        <Link href="/cover-letter" className="group">
+          <div className="p-6 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <FileText className="w-6 h-6" />
+            </div>
+            <h3 className="font-semibold">Cover Letter</h3>
+            <p className="text-emerald-100 text-sm">AI generator</p>
+          </div>
+        </Link>
+
+        <Link href="/export" className="group">
+          <div className="p-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <Download className="w-6 h-6" />
+            </div>
+            <h3 className="font-semibold">Export</h3>
+            <p className="text-indigo-100 text-sm">PDF/DOCX</p>
           </div>
         </Link>
       </div>
