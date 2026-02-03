@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/components/ui/Toast';
-import { Wand2, Loader2, Copy, Check, Sparkles, Target, MessageSquare, Briefcase } from 'lucide-react';
+import { Wand2, Loader2, Copy, Check, Sparkles, Target, MessageSquare, Briefcase, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 const POLISH_TYPES = [
   { id: 'professional', label: 'Professional', icon: Briefcase, instruction: 'Make this more professional and impactful for a resume' },
@@ -67,17 +68,25 @@ export default function AIToolsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl mb-4">
-          <Sparkles className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 animate-in fade-in duration-500">
+        {/* Back Button */}
+        <Link href="/dashboard">
+          <Button variant="ghost" size="sm" className="gap-2 mb-4 hover:bg-gray-100 dark:hover:bg-gray-800">
+            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          </Button>
+        </Link>
+
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl mb-4">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">AI Text Polish</h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Instantly improve any resume bullet point, summary, or experience description
+          </p>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">AI Text Polish</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Instantly improve any resume bullet point, summary, or experience description
-        </p>
-      </div>
 
       {/* Polish Type Selector */}
       <div className="flex flex-wrap justify-center gap-3">
@@ -187,6 +196,7 @@ export default function AIToolsPage() {
           </ul>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
