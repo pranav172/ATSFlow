@@ -73,7 +73,7 @@ export default async function DashboardPage() {
           </div>
         </a>
 
-        <Link href="/latex" className="group">
+        <Link href="/ai-tools" className="group">
           <div className="p-6 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <Sparkles className="w-6 h-6" />
