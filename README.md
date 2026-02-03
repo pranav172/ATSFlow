@@ -35,7 +35,9 @@ AI-powered resume optimization that gets past applicant tracking systems and in 
 | ⚡ **ATS Analysis** | Get your resume scored on ATS compatibility (0-100) with detailed breakdown |
 | 🎯 **AI Optimization** | Rewrite bullets with action verbs, metrics, and impactful language |
 | 🔗 **JD Matching** | Compare your resume against job descriptions with keyword gap analysis |
-| 📄 **Multiple Exports** | Download as PDF, DOCX, or **editable LaTeX (.tex)** |
+| 📄 **Multiple Exports** | Download as PDF, DOCX, TXT, or **editable LaTeX (.tex)** |
+| 💬 **Interview Prep AI** | Generate tailored interview questions with tips and sample answers |
+| ✉️ **Cover Letter Generator** | Create personalized cover letters from your resume and JD |
 | 🧠 **Dual AI Models** | Groq (LLaMA 3.3 70B) for speed + Gemini 2.0 Flash for accuracy |
 | 🔒 **Privacy First** | Your data is encrypted and deleted after 2 years |
 | ⏱️ **Rate Limiting** | Built-in protection against abuse |
@@ -408,13 +410,13 @@ Quick AI polish for resume text.
 ---
 
 #### `POST /api/ai/interview-prep`
-Generate interview questions based on job description.
+Generate tailored interview questions based on resume and job description.
 
 **Request:**
 ```json
 {
-  "jobDescription": "Senior React Developer...",
-  "resumeContext": "Optional resume text for personalization"
+  "resumeText": "Your resume content...",
+  "jobDescription": "Optional: Job description for tailored questions"
 }
 ```
 
@@ -422,12 +424,51 @@ Generate interview questions based on job description.
 ```json
 {
   "questions": [
-    "Describe a complex React component you built and the challenges you faced.",
-    "How do you optimize React applications for performance?",
-    "..."
+    {
+      "question": "Describe a complex React component you built.",
+      "type": "technical",
+      "tip": "Use the STAR method to structure your answer",
+      "sampleAnswer": "I built a real-time dashboard component..."
+    }
   ]
 }
 ```
+
+---
+
+#### `POST /api/ai/cover-letter`
+Generate a tailored cover letter.
+
+**Request:**
+```json
+{
+  "resumeText": "Your resume content...",
+  "jobDescription": "Job description...",
+  "companyName": "Google"
+}
+```
+
+**Response:**
+```json
+{
+  "coverLetter": "Dear Hiring Manager...\n\nI am excited to apply..."
+}
+```
+
+---
+
+#### `POST /api/export`
+Export a resume in various formats.
+
+**Request:**
+```json
+{
+  "resumeId": "uuid-string",
+  "format": "pdf" | "docx" | "txt"
+}
+```
+
+**Response:** Binary file with appropriate Content-Type header.
 
 ---
 
@@ -507,15 +548,22 @@ ATSFlow/
 │   │   ├── upload/route.ts       # Resume upload endpoint
 │   │   ├── analyze/route.ts      # ATS analysis endpoint
 │   │   ├── match/route.ts        # JD matching endpoint
+│   │   ├── export/route.ts       # Export PDF/DOCX/TXT
+│   │   ├── parse-pdf/route.ts    # PDF text extraction
 │   │   ├── ai/                   # AI endpoints
 │   │   │   ├── polish/           # Quick text polish
-│   │   │   └── interview-prep/   # Interview question generation
+│   │   │   ├── interview-prep/   # Interview question generation
+│   │   │   └── cover-letter/     # Cover letter generation
 │   │   ├── resumes/              # Resume CRUD
 │   │   ├── latex/                # LaTeX operations
 │   │   └── webhooks/             # Clerk/Stripe webhooks
 │   ├── dashboard/                # Protected dashboard routes
 │   ├── upload/                   # Upload page
 │   ├── latex/                    # LaTeX editor page
+│   ├── interview-prep/           # Interview prep AI page
+│   ├── cover-letter/             # Cover letter generator page
+│   ├── export/                   # Export resume page
+│   ├── ai-tools/                 # AI text polish page
 │   ├── layout.tsx                # Root layout
 │   ├── page.tsx                  # Landing page
 │   └── globals.css               # Global styles
