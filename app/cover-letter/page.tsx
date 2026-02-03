@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/components/ui/Toast';
-import { FileText, Loader2, ArrowLeft, Copy, Check, Download } from 'lucide-react';
+import { FileText, Loader2, ArrowLeft, Copy, Check, Download, Upload, X } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CoverLetterPage() {
@@ -15,7 +15,50 @@ export default function CoverLetterPage() {
   const [coverLetter, setCoverLetter] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
+
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.includes('pdf')) {
+      addToast({ title: 'Invalid file', description: 'Please upload a PDF file', variant: 'danger' });
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadedFile(file);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/parse-pdf', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      
+      if (data.text) {
+        setResumeText(data.text);
+        addToast({ title: 'Resume uploaded!', description: 'Text extracted successfully', variant: 'success' });
+      } else {
+        throw new Error(data.error || 'Failed to parse PDF');
+      }
+    } catch (error) {
+      addToast({ title: 'Upload failed', description: 'Could not extract text from PDF', variant: 'danger' });
+      setUploadedFile(null);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const clearFile = () => {
+    setUploadedFile(null);
+    setResumeText('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleGenerate = async () => {
     if (resumeText.length < 50 || jobDescription.length < 50) {
@@ -93,14 +136,53 @@ export default function CoverLetterPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
-              <CardTitle className="text-lg">Your Resume</CardTitle>
+              <CardTitle className="text-lg flex items-center justify-between">
+                Your Resume
+                {uploadedFile && (
+                  <button onClick={clearFile} className="text-gray-400 hover:text-red-500 transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-3">
+              {/* Upload Button */}
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors"
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf"
+                  className="hidden"
+                  onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+                />
+                {isUploading ? (
+                  <div className="flex items-center justify-center gap-2 text-emerald-600">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Extracting text...</span>
+                  </div>
+                ) : uploadedFile ? (
+                  <div className="flex items-center justify-center gap-2 text-green-600">
+                    <FileText className="w-5 h-5" />
+                    <span className="font-medium">{uploadedFile.name}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2 text-gray-500">
+                    <Upload className="w-5 h-5" />
+                    <span>Upload PDF resume</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="text-center text-xs text-gray-400">or paste text below</div>
+              
               <Textarea
                 value={resumeText}
                 onChange={(e) => setResumeText(e.target.value)}
                 placeholder="Paste your resume text here..."
-                className="min-h-[180px] resize-none"
+                className="min-h-[130px] resize-none"
               />
             </CardContent>
           </Card>
