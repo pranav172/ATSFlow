@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     // Generate ATS improvement suggestions using AI
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.5-flash-preview-04-17',
+      model: 'gemini-2.5-flash',
       generationConfig: { responseMimeType: 'application/json' }
     });
 
