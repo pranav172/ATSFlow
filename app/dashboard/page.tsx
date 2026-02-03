@@ -63,21 +63,25 @@ export default async function DashboardPage() {
           </div>
         </Link>
 
-        <div className="p-6 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3">
-            <History className="w-6 h-6" />
+        <a href="#resume-list" className="group">
+          <div className="p-6 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <History className="w-6 h-6" />
+            </div>
+            <h3 className="font-semibold">Recent</h3>
+            <p className="text-emerald-100 text-sm">{resumes.length} resumes</p>
           </div>
-          <h3 className="font-semibold">Recent</h3>
-          <p className="text-emerald-100 text-sm">{resumes.length} resumes</p>
-        </div>
+        </a>
 
-        <div className="p-6 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3">
-            <Sparkles className="w-6 h-6" />
+        <Link href="/latex" className="group">
+          <div className="p-6 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <h3 className="font-semibold">AI Tools</h3>
+            <p className="text-amber-100 text-sm">Quick polish</p>
           </div>
-          <h3 className="font-semibold">AI Tools</h3>
-          <p className="text-amber-100 text-sm">Quick polish</p>
-        </div>
+        </Link>
       </div>
 
       {/* AI Insight + Content Grid */}
@@ -132,7 +136,7 @@ export default async function DashboardPage() {
 
       {/* Resume List */}
       {resumes.length > 0 && (
-        <div>
+        <div id="resume-list">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Your Resumes</h2>
             <Link href="/upload">
