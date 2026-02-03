@@ -25,7 +25,13 @@ export async function POST(req: NextRequest) {
     const { latexContent, jobDescription } = await req.json();
 
     if (!latexContent || latexContent.length < 100) {
-      return NextResponse.json({ error: 'Invalid LaTeX content' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid LaTeX content. Please paste at least 100 characters.' }, { status: 400 });
+    }
+
+    // Check API key is configured
+    if (!process.env.GOOGLE_AI_API_KEY) {
+      console.error('GOOGLE_AI_API_KEY is not configured');
+      return NextResponse.json({ error: 'AI service not configured. Please contact support.' }, { status: 500 });
     }
 
     // Parse LaTeX to extract readable text
@@ -77,7 +83,26 @@ Return JSON:
     const response = await result.response;
     const text = response.text();
     
-    const analysis = JSON.parse(text);
+    // Try to parse JSON - the AI might return markdown-wrapped JSON
+    let analysis;
+    try {
+      // Try direct parse first
+      analysis = JSON.parse(text);
+    } catch {
+      // Try to extract JSON from markdown code blocks
+      const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (jsonMatch) {
+        analysis = JSON.parse(jsonMatch[1].trim());
+      } else {
+        // Try to find JSON object directly
+        const objectMatch = text.match(/\{[\s\S]*\}/);
+        if (objectMatch) {
+          analysis = JSON.parse(objectMatch[0]);
+        } else {
+          throw new Error('Could not parse AI response as JSON');
+        }
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -88,6 +113,22 @@ Return JSON:
 
   } catch (error) {
     console.error('LaTeX analysis error:', error);
-    return NextResponse.json({ error: 'Failed to analyze LaTeX resume' }, { status: 500 });
+    
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('API key')) {
+        return NextResponse.json({ error: 'AI service configuration error. Please contact support.' }, { status: 500 });
+      }
+      if (error.message.includes('parse') || error.message.includes('JSON')) {
+        return NextResponse.json({ error: 'Failed to process AI response. Please try again.' }, { status: 500 });
+      }
+      if (error.message.includes('quota') || error.message.includes('limit')) {
+        return NextResponse.json({ error: 'AI service rate limit reached. Please try again later.' }, { status: 429 });
+      }
+      // Log the actual error for debugging
+      console.error('Detailed error:', error.message);
+    }
+    
+    return NextResponse.json({ error: 'Failed to analyze LaTeX resume. Please try again.' }, { status: 500 });
   }
 }
