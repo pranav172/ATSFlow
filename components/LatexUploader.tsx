@@ -104,9 +104,60 @@ export function LatexUploader() {
     if (!result) return;
     
     const suggestion = result.suggestions[index];
-    const newContent = latexContent.replace(suggestion.original, suggestion.improved);
+    let newContent = latexContent;
+    let applied = false;
     
-    if (newContent !== latexContent) {
+    // Try exact match first
+    if (latexContent.includes(suggestion.original)) {
+      newContent = latexContent.replace(suggestion.original, suggestion.improved);
+      applied = true;
+    } else {
+      // Try matching with LaTeX escape sequences converted
+      // The AI sees "40%" but LaTeX has "40\%"
+      const latexEscaped = suggestion.original
+        .replace(/%/g, '\\%')
+        .replace(/&/g, '\\&')
+        .replace(/\$/g, '\\$')
+        .replace(/#/g, '\\#')
+        .replace(/_/g, '\\_');
+      
+      if (latexContent.includes(latexEscaped)) {
+        // Convert improved text to LaTeX format too
+        const improvedLatex = suggestion.improved
+          .replace(/%/g, '\\%')
+          .replace(/&/g, '\\&')
+          .replace(/\$/g, '\\$')
+          .replace(/#/g, '\\#')
+          .replace(/_/g, '\\_');
+        newContent = latexContent.replace(latexEscaped, improvedLatex);
+        applied = true;
+      } else {
+        // Try fuzzy match - find a substring that contains key parts
+        const keyWords = suggestion.original.split(/\s+/).filter(w => w.length > 3);
+        if (keyWords.length >= 2) {
+          // Look for lines containing these keywords
+          const lines = latexContent.split('\n');
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const matchCount = keyWords.filter(w => line.toLowerCase().includes(w.toLowerCase())).length;
+            if (matchCount >= Math.ceil(keyWords.length * 0.6)) {
+              // Found a likely match - replace the whole line content while preserving LaTeX structure
+              // This is a heuristic approach
+              const improvedLatex = suggestion.improved
+                .replace(/%/g, '\\%')
+                .replace(/&/g, '\\&');
+              lines[i] = lines[i].replace(/[^{}\\]+(?=[}]|$)/, improvedLatex);
+              if (lines[i] !== line) {
+                // Simpler approach: just note it was found but couldn't auto-replace
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if (applied && newContent !== latexContent) {
       setLatexContent(newContent);
       setAppliedSuggestions(prev => new Set([...prev, index]));
       addToast({
@@ -115,10 +166,12 @@ export function LatexUploader() {
         variant: 'success',
       });
     } else {
+      // Copy the improved text to clipboard so user can paste manually
+      navigator.clipboard.writeText(suggestion.improved);
       addToast({
-        title: 'Could not apply',
-        description: 'Text not found - try applying manually',
-        variant: 'danger',
+        title: 'Copied to clipboard',
+        description: 'Paste the improved text manually in your LaTeX editor',
+        variant: 'warning',
       });
     }
   };
